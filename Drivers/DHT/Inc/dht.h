@@ -1,6 +1,12 @@
 #ifndef __DHT_H_
 #define __DHT_H_
 
+#include <sys/types.h>
+#include <string.h>
+#include <unistd.h>
+#include <stdint.h>
+#include <stdlib.h>
+
 #define DHT_PIN_OUTPUT 0
 #define DHT_PIN_INPUT 1
 #define DHT_PIN_LOW 0
