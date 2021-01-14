@@ -1,31 +1,40 @@
+# Вспомогательные переменные
+# Имя компилятора
 CC = gcc
+# Директория с выходными файлами
 bin_dir = Bin
+# Имя исполняемого файла
 app_name = hdht
-core_src = Core/Src
-core_inc = Core/Inc
-dht_src = Drivers/DHT/Src
-dht_inc = Drivers/DHT/Inc
+# Флаги компиляции
+flags = -lwiringPi -lpthread
+
+# Пути с исходниками
+DIR1 = Core
+DIR2 = Drivers/DHT
+DIR3 = Drivers/Median_Filter
+
+# Формирование массива каталогов проекта
+path_list = $(DIR1) $(DIR2)
+header_list = $(foreach d, $(path_list), -I $d/Inc)
+
+# Список объектных файлов
+objects = $(bin_dir)/main.o $(bin_dir)/dht.o $(bin_dir)/dht_if.o
 
 $(shell mkdir -p $(bin_dir))
 
-app:	$(bin_dir)/main.o $(bin_dir)/dht.o $(bin_dir)/dht_if.o
-	$(CC) $(bin_dir)/main.o $(bin_dir)/dht.o $(bin_dir)/dht_if.o -lwiringPi -lpthread -o $(bin_dir)/$(app_name)
+# Правило для сборки исполняемого файла
+app:	$(objects)
+	$(CC) $(objects) $(flags) -o $(bin_dir)/$(app_name)
 
-$(bin_dir)/main.o:	$(core_src)/main.c
-	$(CC) -Wall -E $(core_src)/main.c -lwiringPi -lpthread -o $(bin_dir)/main.i
-	$(CC) -Wall -S $(bin_dir)/main.i -lwiringPi -lpthread -o $(bin_dir)/main.s
-	$(CC) -Wall -c $(core_src)/main.c -lwiringPi -lpthread -o $(bin_dir)/main.o
+# Правило сборки для каталога DIR1
+$(bin_dir)/%.o: $(DIR1)/Src/%.c $(wildcard $(DIR1)/Inc/*.h)
+	$(CC) -Wall -c $< $(header_list) $(flags) -o $@
 
-$(bin_dir)/dht.o:      $(dht_src)/dht.c $(dht_inc)/dht.h
-	$(CC) -Wall -E $(dht_src)/dht.c -I $(dht_inc) -lwiringPi -lpthread -o $(bin_dir)/dht.i
-	$(CC) -Wall -S $(bin_dir)/dht.i -lwiringPi -lpthread -o $(bin_dir)/dht.s
-	$(CC) -Wall -c $(dht_src)/dht.c -I $(dht_inc) -lwiringPi -lpthread -o $(bin_dir)/dht.o
+# Правило сборки для каталога DIR2
+$(bin_dir)/%.o: $(DIR2)/Src/%.c $(wildcard $(DIR2)/Inc/*.h)
+	$(CC) -Wall -c $< $(header_list) $(flags) -o $@
 
-$(bin_dir)/dht_if.o:      $(core_src)/dht_if.c $(core_inc)/dht_if.h
-	$(CC) -Wall -E $(core_src)/dht_if.c -I $(core_inc) -I $(dht_inc)  -lwiringPi -lpthread -o $(bin_dir)/dht_if.i
-	$(CC) -Wall -S $(bin_dir)/dht_if.i -lwiringPi -lpthread -o $(bin_dir)/dht_if.s
-	$(CC) -Wall -c $(core_src)/dht_if.c -I $(core_inc) -I $(dht_inc) -lwiringPi -lpthread -o $(bin_dir)/dht_if.o
-
+# Правило для очистки
 clean:
 	rm -r $(bin_dir)
 
