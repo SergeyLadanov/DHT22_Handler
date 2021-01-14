@@ -30,8 +30,8 @@ typedef struct __DHT_Obj
 void DHT_PinMode(DHT_Obj *hdht, uint8_t mode);
 void DHT_PinWrite(DHT_Obj *hdht, uint8_t state);
 uint8_t DHT_PinRead(DHT_Obj *hdht);
-void DHT_Delay_us(DHT_Obj *hdht, uint32_t delay);
-void DHT_Delay_ms(DHT_Obj *hdht, uint32_t delay);
+void DHT_Delay_us(DHT_Obj *hdht, uint32_t value);
+void DHT_Delay_ms(DHT_Obj *hdht, uint32_t value);
 
 DHT_Result* DHT_Read(DHT_Obj *hdht);
 

@@ -18,14 +18,14 @@ __attribute__((weak)) uint8_t DHT_PinRead(DHT_Obj *hdht)
     return 0;
 }
 //----------------------------------------------
-__attribute__((weak)) void DHT_Delay_us(DHT_Obj *hdht, uint32_t delay)
+__attribute__((weak)) void DHT_Delay_us(DHT_Obj *hdht, uint32_t value)
 {
-    (void) delay;
+    (void) value;
 }
 //----------------------------------------------
-__attribute__((weak)) void DHT_Delay_ms(DHT_Obj *hdht, uint32_t delay)
+__attribute__((weak)) void DHT_Delay_ms(DHT_Obj *hdht, uint32_t value)
 {
-    (void) delay;
+    (void) value;
 }
 //----------------------------------------------
 DHT_Result* DHT_Read(DHT_Obj *hdht)
