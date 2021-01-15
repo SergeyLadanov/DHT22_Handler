@@ -11,6 +11,8 @@
 #include <wiringPi.h>
 #include <stdint.h>
 #include <pthread.h>
+#include "dsp_filters.h"
+#include "dht_if.h"
 
 //Thread defines
 #define ERROR_CREATE_THREAD -11
@@ -29,8 +31,9 @@
 #define SEND_BUL_LEN 1025
 // Period of collecting data (in minutes)
 #define DATA_COLLECTING_PERIOD 30
-// Median filter Length
-#define FILER_LENGTH 10
+// Р Р°Р·РјРµСЂ РјРµРґРёР°РЅРЅРѕРіРѕ С„РёР»СЊС‚СЂР°
+#define MEDIAN_FILTER_SIZE 10
+
 
 
 //Time data
@@ -39,7 +42,6 @@ typedef struct{
 	int Minutes;
 }timeDataTypeDef;
 
-uint8_t data[5] = { 0, 0, 0, 0, 0 };
 
 //Storages for data
 float hum_mass[DATA_LEN];
@@ -54,90 +56,16 @@ float cur_hum = 0.0f;
 struct tm cur_time;
 pthread_mutex_t mutex;
 /********************MATH FUNCTIONS***************************/
-float mod(float x)
-{
-	if (x < 0.0f)
-	{
-		x = -x;
-	}
 
-	return x;
-}
-//------------------------------------------------
 
-// Обработчик фильтра первого порядка
-typedef struct{
-    float X1; // Предыдущее значение входного сигнала
-    float Y1; // Предыдущее значение фильтра
-    float KX0; // Коэффициент текущего значения входного сигнала
-    float KX1; // Коэффициент предыдущего значения входного сигнала
-    float KY1; // Коэффициент предыдущего значения выходного сигнала
-}hFilterTypeDef;
 
-//Median filter
-typedef struct{
-	float Buf[FILER_LENGTH];
-	uint8_t Cnt;
-}HandlerMedianFilter;
 
-HandlerMedianFilter hfHum, hfTemp;
-hFilterTypeDef lpfHum, lpfTemp;
 
-//---------------------------------------------------------------
-void rdspFilterInit(hFilterTypeDef *hFilter, float kx0, float kx1, float ky1)
-{
-    hFilter->KX0 = kx0;
-    hFilter->KX1 = kx1;
-    hFilter->KY1 = ky1;
-}
-//-------------------------------------------------------------------
+DSP_MFN_Obj mfnHum, mfnTemp;
+DSP_LPF1_Obj lpfHum, lpfTemp;
 
-float rdspFilter(hFilterTypeDef *hFilter, float X0)
-{
-    float Y0 = 0.0f;
 
-    Y0 = hFilter->KX0 * X0 + hFilter->KX1 * hFilter->X1 + hFilter->KY1 * hFilter->Y1;
-    hFilter->Y1 = Y0;
-    hFilter->X1 = X0;
 
-    return Y0;
-}
-
-// Median filter function for N values
-float median_n(HandlerMedianFilter *hFilter, float newVal)
-{
-	float *buffer = hFilter->Buf;
-	buffer[hFilter->Cnt] = newVal;
-	if ((hFilter->Cnt < FILER_LENGTH - 1) && (buffer[hFilter->Cnt] > buffer[hFilter->Cnt + 1])) 
-	{
-		for (int i = hFilter->Cnt; i < FILER_LENGTH - 1; i++) 
-		{
-			if (buffer[i] > buffer[i + 1]) 
-			{
-				float buff = buffer[i];
-				buffer[i] = buffer[i + 1];
-				buffer[i + 1] = buff;
-			}
-		}
-	}
-	else 
-	{
-		if ((hFilter->Cnt > 0) && (buffer[hFilter->Cnt - 1] > buffer[hFilter->Cnt])) 
-		{
-			for (int i = hFilter->Cnt; i > 0; i--) 
-			{
-				if (buffer[i] < buffer[i - 1])
-				{
-					float buff = buffer[i];
-					buffer[i] = buffer[i - 1];
-					buffer[i - 1] = buff;
-				}
-			}
-		}
-	}
-	hFilter->Cnt = (hFilter->Cnt + 1) % FILER_LENGTH;
-	return buffer[(int)FILER_LENGTH / 2];
-}
 //-------------------------------------------------------------------
 //Initialization of time hum_mass
 void timeStorageIni(void)
@@ -180,79 +108,7 @@ float module(float x)
 
 	return x;
 }
-// Get dht sensor data
-uint8_t read_dht_data()
-{
-    uint8_t j = 0, i;
-	uint32_t cnt_delay = 0xFFFFFFFF;
 
-// Variables for protect for wrong values
-//	static float temp_1 = 0.0f; // Backup value of temperature
-//	static float hum_1 = 0.0f; // Backup value of hum
-//	static uint8_t tries = 0; // Tries counter
-//------------------------------------------
-
-    data[0] = data[1] = data[2] = data[3] = data[4] = 0;
-
-    /* pull pin down for 18 milliseconds */
-    pinMode( DHT_PIN, OUTPUT );
-    digitalWrite( DHT_PIN, LOW );
-    delay( 18 );
-    /* prepare to read the pin */
-    pinMode( DHT_PIN, INPUT );
-    delayMicroseconds(39);
-    if (digitalRead(DHT_PIN) == 1)
-    {
-		return 0;
-    }
-
-    delayMicroseconds(80);
-
-    if (digitalRead(DHT_PIN) == 0)
-    {
-		return 0;
-    }
-
-    delayMicroseconds(80);
-
-    for (j = 0; j < 5; j++)
-    {
-		data[4-j]=0;
-		for(i=0; i<8; i++)
-		{
-			cnt_delay = 0xFFFFFFFF;
-			while(digitalRead(DHT_PIN) == 0)
-			{
-				cnt_delay--;
-				if (cnt_delay == 0)
-				{
-					return 0;
-				}
-			}
-			delayMicroseconds(30);
-			if (digitalRead(DHT_PIN) == 1)
-			{
-				data[4-j] |= (1<<(7-i));
-			}
-			cnt_delay = 0xFFFFFFFF;
-			while(digitalRead(DHT_PIN) == 1)
-			{
-				cnt_delay--;
-				if (cnt_delay == 0)
-				{
-					return 0;
-				}
-			}
-		}
-    }
-
-    temper = (float)((*(uint16_t*)(data+1)) & 0x3FFF) / 10;
-    if((*(uint16_t*)(data+1)) & 0x8000) temper *= -1.0;
-
-    hum = (float)(*(int16_t*)(data+3)) / 10;
-
-    return 1;
-}
 
 //Half hour detect function
 uint8_t halfHour(struct tm *tim)
@@ -281,8 +137,11 @@ void* dht_handle(void *args) {
 	timeDataTypeDef tm;
 //	printf("Thread has been started!\n");
 
-	rdspFilterInit(&lpfHum, 0.03, 0.02, 0.95);
-	rdspFilterInit(&lpfTemp, 0.03, 0.02, 0.95);
+	DSP_MFN_Init(&mfnHum, MEDIAN_FILTER_SIZE);
+	DSP_MFN_Init(&mfnTemp, MEDIAN_FILTER_SIZE);
+
+	DSP_LPF1_Init(&lpfHum, 0.03, 0.02, 0.95);
+	DSP_LPF1_Init(&lpfTemp, 0.03, 0.02, 0.95);
 
 	while(1)
 	{
