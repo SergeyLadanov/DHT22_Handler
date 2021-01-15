@@ -25,8 +25,16 @@ typedef struct{
     float *Hum;
     float *Temp;
     DC_TimeObj *Time;
+    float CurHum;
+    float CurTemp;
     struct tm CurTime;
+    uint32_t WriteIndex;
 }DC_StorageObj;
+
+
+uint8_t DC_Init(DC_StorageObj *hdc, uint32_t size, uint32_t period);
+void DC_Handle(DC_StorageObj *hdc, float t, float h, struct tm *tim);
+void DC_GetPacket(DC_StorageObj *hdc, char *buf, uint32_t len);
 
 
 

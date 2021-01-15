@@ -15,128 +15,54 @@
 #include "dht_if.h"
 #include "datacontrol.h"
 
-//Thread defines
+// Определения для задач
 #define ERROR_CREATE_THREAD -11
 #define ERROR_JOIN_THREAD   -12
 #define SUCCESS        0
 
-//DHT settings
-#define MAX_TIMINGS 85
-// Pin for sensor
-#define DHT_PIN 7
-// Length of data storage
+// Размер хранилища данных
 #define DATA_LEN 24
-// Listen port
+// Открытый TCP порт
 #define SERVER_PORT 9090
-// Length of tcp buffer
+// Длина буфера отправки
 #define SEND_BUL_LEN 1025
-// Period of collecting data (in minutes)
+// Период сбора данных (в минутах)
 #define DATA_COLLECTING_PERIOD 30
 // Размер медианного фильтра
 #define MEDIAN_FILTER_SIZE 10
 
-
-
-
-
-
-//Storages for data
-float hum_mass[DATA_LEN];
-float temp_mass[DATA_LEN];
-DC_TimeObj time_mass[DATA_LEN];
-
-uint8_t writeIndex = 0;
-float temper = 0.0f;
-float cur_temp = 0.0f;
-float hum = 0.0f;
-float cur_hum = 0.0f;
-struct tm cur_time;
+// Объект мьютекса
 pthread_mutex_t mutex;
-/********************MATH FUNCTIONS***************************/
+// Объект хранилища данных
+DC_StorageObj hdc;
 
 
-
-
-
-DSP_MFN_Obj mfnHum, mfnTemp;
-DSP_LPF1_Obj lpfHum, lpfTemp;
-
-
-
-//-------------------------------------------------------------------
-//Initialization of time hum_mass
-void timeStorageIni(void)
-{
-	for (uint32_t i = 0; i < DATA_LEN; i++)
-	{
-		time_mass[i].Hours = -1;
-		time_mass[i].Minutes = -1;
-	}
-}
-
-/*************************DATA FUNCTIONS****************************/
-//-----------------------------------------------------
-float getLastTemp()
-{
-	return temp_mass[(writeIndex + (DATA_LEN - 1)) % DATA_LEN];
-} 
-//------------------------------------------------------
-float getLastHum()
-{
-	return hum_mass[(writeIndex + (DATA_LEN - 1)) % DATA_LEN];
-}
-//------------------------------------------------------
-
-void placeData(float h, float t, timeDataTypeDef *tm)
-{
-	hum_mass[writeIndex] = h;
-	temp_mass[writeIndex] = t;
-	time_mass[writeIndex].Hours = tm->Hours;
-	time_mass[writeIndex].Minutes = tm->Minutes;
-	writeIndex = (writeIndex + 1) % DATA_LEN;
-}
-//Module function
-float module(float x)
-{
-	if (x < 0)
-	{
-		x = -x;
-	}
-
-	return x;
-}
-
-
-//Half hour detect function
-uint8_t halfHour(struct tm *tim)
-{
-	static uint8_t flag = 0;
-
-	if ((tim->tm_min % DATA_COLLECTING_PERIOD) == 0)
-	{
-		if (flag == 0)
-		{
-			flag = 1;
-			return 1;
-		}
-	}
-	else
-	{
-		flag = 0;
-	}
-	
-	return 0;
-}
-//DHT task handler
+// Задача обработки датчика
 void* dht_handle(void *args) {
 	struct tm *u;
 	time_t timer;
 	DC_TimeObj tm;
-//	printf("Thread has been started!\n");
+	float temperature = 0.0f;
+	float humudity = 0.0f;
+	DSP_MFN_Obj mfnHum, mfnTemp;
+	DSP_LPF1_Obj lpfHum, lpfTemp;
+	DHT_Obj hdht;
+	DHT_Result *dhtr;
 
-	DSP_MFN_Init(&mfnHum, MEDIAN_FILTER_SIZE);
-	DSP_MFN_Init(&mfnTemp, MEDIAN_FILTER_SIZE);
+	
+	printf("Thread has been started!\n");
 
+	// Инициализация медианных фильтров
+	if (DSP_MFN_Init(&mfnHum, MEDIAN_FILTER_SIZE) != 0)
+	{
+		printf("Error of initialization mfn1!\r\n");
+	}
+	
+	if (DSP_MFN_Init(&mfnTemp, MEDIAN_FILTER_SIZE) != 0)
+	{
+		printf("Error of initialization mfn2!\r\n");
+	}
+	// Инициализация фнч первого порядка
 	DSP_LPF1_Init(&lpfHum, 0.03, 0.02, 0.95);
 	DSP_LPF1_Init(&lpfTemp, 0.03, 0.02, 0.95);
 
@@ -145,31 +71,18 @@ void* dht_handle(void *args) {
 		pthread_mutex_lock(&mutex);
 		timer = time(NULL);
 		u = localtime(&timer);
-//		printf("%d/%d/%d %d:%d:%d\n", u->tm_mday, u->tm_mon + 1, u->tm_year % 100, u->tm_hour, u->tm_min, u->tm_sec);
-		// cur_time.tm_mday = u->tm_mday;
-		// cur_time.tm_mon = u->tm_mon;
-		// cur_time.tm_year = u->tm_year;
-		// cur_time.tm_hour = u->tm_hour;
-		// cur_time.tm_min = u->tm_min;
-		// cur_time.tm_sec = u->tm_sec;
-		if (read_dht_data() == 1)
+		printf("Time and date: %d/%d/%d %d:%d:%d\n", u->tm_mday, u->tm_mon + 1, u->tm_year % 100, u->tm_hour, u->tm_min, u->tm_sec);
+		dhtr = DHT_Read(hdht);
+
+		if (dhtr != NULL)
 		{
-			cur_temp = median_n(&hfTemp, temper);
-			cur_hum = median_n(&hfHum, hum);
+			temperature = DSP_MFN_Handle(&mfnTemp, dhtr->Temperature);
+			humudity = DSP_MFN_Handle(&mfnHum, dhtr->Humidity);
 
-			cur_temp = rdspFilter(&lpfTemp, cur_temp);
-			cur_hum = rdspFilter(&lpfHum, cur_hum);
-
-//			printf( "By filter: %.1f;%.1f\n", cur_hum, cur_temp);
-//			printf( "Without filter: %.1f;%.1f\n", hum, temper);
+			temperature = DSP_LPF1_Handle(&lpfTemp, temperature);
+			humudity = DSP_LPF1_Handle(&lpfHum, humudity);
 		}
-// 		if (halfHour(u) == 1)
-// 		{
-// 			tm.Hours = u->tm_hour;
-// 			tm.Minutes = u->tm_min;
-// //			printf("Putting data in storage...\n");
-// 			placeData(cur_hum, cur_temp, &tm);
-// 		}
+		DC_Handle(&hdc, temperature, humudity, u);
 		pthread_mutex_unlock(&mutex);
 		sleep(2);
 	}
@@ -178,7 +91,7 @@ void* dht_handle(void *args) {
 
 
 
-/***************************MAIN PROGRAM*************************/
+// Функция main
 int main(int argc, char *argv[]) {
 	int listenfd = 0, connfd = 0;
 	struct sockaddr_in serv_addr;
@@ -186,9 +99,12 @@ int main(int argc, char *argv[]) {
 
 	pthread_t thread;
 	int status;
-	//Time mass ini
-	timeStorageIni();
-	//int status_addr;
+	// Инициализация хранилища данных
+	if (DC_Init(&hdc, DATA_LEN, DATA_COLLECTING_PERIOD) != 0)
+	{
+		printf("Error of initialization data storage!\r\n");
+	}
+
 	pthread_mutex_init(&mutex, NULL);
 	status = pthread_create(&thread, NULL, dht_handle, NULL);
 
@@ -197,9 +113,10 @@ int main(int argc, char *argv[]) {
 		exit(ERROR_CREATE_THREAD);
 
 	}
-
+	// Инициализация портов ввода вывода
 	if ( wiringPiSetup() == -1 )
 	{
+		printf("Error of initialization wiringPi!\r\n");
 		exit(1);
 	}
 
@@ -217,15 +134,15 @@ int main(int argc, char *argv[]) {
 	listen(listenfd, 10);
 
 	while(1) {
-		// Accept a connection
+		// Ожидание подключения
 		connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
-		// Preparing repply	
+		// Подготовка ответа	
 		pthread_mutex_lock(&mutex);		                                                                                                                                      
-		repplyPrepare(sendBuff, sizeof(sendBuff));
+		DC_GetPacket(&hdc, sendBuff, sizeof(sendBuff));
 		pthread_mutex_unlock(&mutex);
-		// Send data
+		// Отправка ответа
 		write(connfd, sendBuff, strlen(sendBuff));
-		// Closing connection
+		// Закрытие соединение
 		close(connfd);
 	}
 }
