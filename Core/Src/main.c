@@ -13,6 +13,7 @@
 #include <pthread.h>
 #include "dsp_filters.h"
 #include "dht_if.h"
+#include "datacontrol.h"
 
 //Thread defines
 #define ERROR_CREATE_THREAD -11
@@ -36,17 +37,13 @@
 
 
 
-//Time data
-typedef struct{
-	int Hours;
-	int Minutes;
-}timeDataTypeDef;
+
 
 
 //Storages for data
 float hum_mass[DATA_LEN];
 float temp_mass[DATA_LEN];
-timeDataTypeDef time_mass[DATA_LEN];
+DC_TimeObj time_mass[DATA_LEN];
 
 uint8_t writeIndex = 0;
 float temper = 0.0f;
@@ -134,7 +131,7 @@ uint8_t halfHour(struct tm *tim)
 void* dht_handle(void *args) {
 	struct tm *u;
 	time_t timer;
-	timeDataTypeDef tm;
+	DC_TimeObj tm;
 //	printf("Thread has been started!\n");
 
 	DSP_MFN_Init(&mfnHum, MEDIAN_FILTER_SIZE);
@@ -149,12 +146,12 @@ void* dht_handle(void *args) {
 		timer = time(NULL);
 		u = localtime(&timer);
 //		printf("%d/%d/%d %d:%d:%d\n", u->tm_mday, u->tm_mon + 1, u->tm_year % 100, u->tm_hour, u->tm_min, u->tm_sec);
-		cur_time.tm_mday = u->tm_mday;
-		cur_time.tm_mon = u->tm_mon;
-		cur_time.tm_year = u->tm_year;
-		cur_time.tm_hour = u->tm_hour;
-		cur_time.tm_min = u->tm_min;
-		cur_time.tm_sec = u->tm_sec;
+		// cur_time.tm_mday = u->tm_mday;
+		// cur_time.tm_mon = u->tm_mon;
+		// cur_time.tm_year = u->tm_year;
+		// cur_time.tm_hour = u->tm_hour;
+		// cur_time.tm_min = u->tm_min;
+		// cur_time.tm_sec = u->tm_sec;
 		if (read_dht_data() == 1)
 		{
 			cur_temp = median_n(&hfTemp, temper);
@@ -166,62 +163,19 @@ void* dht_handle(void *args) {
 //			printf( "By filter: %.1f;%.1f\n", cur_hum, cur_temp);
 //			printf( "Without filter: %.1f;%.1f\n", hum, temper);
 		}
-		if (halfHour(u) == 1)
-		{
-			tm.Hours = u->tm_hour;
-			tm.Minutes = u->tm_min;
-//			printf("Putting data in storage...\n");
-			placeData(hum, temper, &tm);
-		}
+// 		if (halfHour(u) == 1)
+// 		{
+// 			tm.Hours = u->tm_hour;
+// 			tm.Minutes = u->tm_min;
+// //			printf("Putting data in storage...\n");
+// 			placeData(cur_hum, cur_temp, &tm);
+// 		}
 		pthread_mutex_unlock(&mutex);
 		sleep(2);
 	}
 	return SUCCESS;
 }
-//----------------------------------------------------------------
-void repplyPrepare(char *buf, uint32_t len)
-{
-	char tmp[1024];
-	uint32_t index;
-	memset(buf, 0, len);
-	sprintf(tmp, "%.1f;%.1f\r\n", cur_hum, cur_temp);
-	strcat(buf, tmp);
-	sprintf(tmp, "%02d:%02d %02d/%02d/%02d\r\n", cur_time.tm_hour, cur_time.tm_min, cur_time.tm_mday, cur_time.tm_mon + 1, cur_time.tm_year % 100);
-	strcat(buf, tmp);
-	// Put temperature mass
-	for (uint32_t i = 0; i < DATA_LEN; i++)
-	{
-		index = (writeIndex + i) % DATA_LEN;
-		if ((time_mass[index].Hours != -1) && (time_mass[index].Minutes != -1))
-		{
-			sprintf(tmp, "%.1f;",temp_mass[index]);
-			strcat(buf, tmp);
-		}
-	}
-	strcat(buf, "\r\n");
-	// Put hum mass
-	for (uint32_t i = 0; i < DATA_LEN; i++)
-	{
-		index = (writeIndex + i) % DATA_LEN;
-		if ((time_mass[index].Hours != -1) && (time_mass[index].Minutes != -1))
-		{
-			sprintf(tmp, "%.1f;", hum_mass[index]);
-			strcat(buf, tmp);
-		}
-	}
-	strcat(buf, "\r\n");
-	// Put hum mass
-	for (uint32_t i = 0; i < DATA_LEN; i++)
-	{
-		index = (writeIndex + i) % DATA_LEN;
-		if ((time_mass[index].Hours != -1) && (time_mass[index].Minutes != -1))
-		{
-			sprintf(tmp, "%02d:%02d;",time_mass[index].Hours, time_mass[index].Minutes);
-			strcat(buf, tmp);
-		}
-	}
-	
-}
+
 
 
 /***************************MAIN PROGRAM*************************/
