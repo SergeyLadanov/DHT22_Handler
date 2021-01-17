@@ -7,7 +7,7 @@ static uint8_t DC_PeriodElapsed(DC_StorageObj *hdc)
 	{
 		if (hdc->PeriodFlag == 0)
 		{
-			hdc->PeriodFlag;
+			hdc->PeriodFlag = 1;
 			return 1;
 		}
 	}
@@ -59,7 +59,7 @@ uint8_t DC_Init(DC_StorageObj *hdc, uint32_t size, uint32_t period)
 		return 1;
 	}
 
-	hdc->Time = (float *) malloc(sizeof(DC_TimeObj) * hdc->Size);
+	hdc->Time = (DC_TimeObj *) malloc(sizeof(DC_TimeObj) * hdc->Size);
 
 	if (hdc->Time == NULL)
 	{
@@ -75,7 +75,11 @@ uint8_t DC_Init(DC_StorageObj *hdc, uint32_t size, uint32_t period)
 // Обработка данных
 void DC_Handle(DC_StorageObj *hdc, float t, float h, struct tm *tim)
 {
-	memcpy(tim, &hdc->CurTime, sizeof(hdc->CurTime));
+	hdc->CurTime.tm_hour = tim->tm_hour;
+	hdc->CurTime.tm_min = tim->tm_min;
+	hdc->CurTime.tm_mday = tim->tm_mday;
+	hdc->CurTime.tm_mon = tim->tm_mon;
+	hdc->CurTime.tm_year = tim->tm_year;
 	hdc->CurTemp = t;
 	hdc->CurHum = h;
 

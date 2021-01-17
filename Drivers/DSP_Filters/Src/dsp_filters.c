@@ -6,6 +6,8 @@ void DSP_LPF1_Init(DSP_LPF1_Obj *hFilter, float kx0, float kx1, float ky1)
     hFilter->KX0 = kx0;
     hFilter->KX1 = kx1;
     hFilter->KY1 = ky1;
+	hFilter->X1 = 0;
+	hFilter->Y1 = 0;
 }
 
 // Фунция обработки фильтра первого порядка

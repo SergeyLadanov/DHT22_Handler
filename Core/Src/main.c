@@ -36,14 +36,15 @@ pthread_mutex_t mutex;
 // Объект хранилища данных
 DC_StorageObj hdc;
 
+float temperature = 0.0f;
+float humudity = 0.0f;
+
 
 // Задача обработки датчика
 void* dht_handle(void *args) {
 	struct tm *u;
 	time_t timer;
-	DC_TimeObj tm;
-	float temperature = 0.0f;
-	float humudity = 0.0f;
+
 	DSP_MFN_Obj mfnHum, mfnTemp;
 	DSP_LPF1_Obj lpfHum, lpfTemp;
 	DHT_Obj hdht;
@@ -72,15 +73,20 @@ void* dht_handle(void *args) {
 		timer = time(NULL);
 		u = localtime(&timer);
 		printf("Time and date: %d/%d/%d %d:%d:%d\n", u->tm_mday, u->tm_mon + 1, u->tm_year % 100, u->tm_hour, u->tm_min, u->tm_sec);
-		dhtr = DHT_Read(hdht);
+		dhtr = DHT_Read(&hdht);
 
 		if (dhtr != NULL)
 		{
+			printf("T = %.2f H = %.2f\r\n", dhtr->Temperature, dhtr->Humidity);
 			temperature = DSP_MFN_Handle(&mfnTemp, dhtr->Temperature);
 			humudity = DSP_MFN_Handle(&mfnHum, dhtr->Humidity);
 
+			printf("After median filtering: T = %.2f H = %.2f\r\n", temperature, humudity);
+
 			temperature = DSP_LPF1_Handle(&lpfTemp, temperature);
 			humudity = DSP_LPF1_Handle(&lpfHum, humudity);
+
+			printf("After lpf filtering: T = %.2f H = %.2f\r\n", temperature, humudity);
 		}
 		DC_Handle(&hdc, temperature, humudity, u);
 		pthread_mutex_unlock(&mutex);
