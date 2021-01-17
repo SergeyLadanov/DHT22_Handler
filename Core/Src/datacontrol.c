@@ -117,7 +117,7 @@ void DC_GetPacket(DC_StorageObj *hdc, char *buf, uint32_t len)
 		index = (hdc->WriteIndex + i) % hdc->Size;
 		if ((hdc->Time[index].Hours != -1) && (hdc->Time[index].Minutes != -1))
 		{
-			sprintf(tmp, "%.1f;", hdc->Temp[index]);
+			sprintf(tmp, "%.1f;", hdc->Hum[index]);
 			strcat(buf, tmp);
 		}
 	}
