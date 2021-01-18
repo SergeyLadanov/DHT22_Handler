@@ -1,6 +1,11 @@
 #ifndef __DSP_FILTERS_H_
 #define __DSP_FILTERS_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -29,5 +34,10 @@ float DSP_LPF1_Handle(DSP_LPF1_Obj *hFilter, float X0);
 uint8_t DSP_MFN_Init(DSP_MFN_Obj *hFilter, uint32_t size);
 void DSP_MFN_DeInit(DSP_MFN_Obj *hFilter, uint32_t size);
 float DSP_MFN_Handle(DSP_MFN_Obj *hFilter, float newVal);
+	 
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif
