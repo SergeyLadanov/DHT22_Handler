@@ -1,6 +1,11 @@
 #ifndef __DHT_H_
 #define __DHT_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
+
 #include <sys/types.h>
 #include <string.h>
 #include <unistd.h>
@@ -34,6 +39,11 @@ void DHT_Delay_us(DHT_Obj *hdht, uint32_t value);
 void DHT_Delay_ms(DHT_Obj *hdht, uint32_t value);
 
 DHT_Result* DHT_Read(DHT_Obj *hdht);
+     
+#ifdef __cplusplus
+}
+#endif
+
 
 
 #endif
