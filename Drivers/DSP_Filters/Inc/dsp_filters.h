@@ -12,12 +12,19 @@
 #include <string.h>
 
 
-// Обработчик медианного фильтра
+// Обработчик медианного фильтра из N значений
 typedef struct{
 	float *Buf;
 	uint8_t Cnt;
     uint32_t Size;
 }DSP_MFN_Obj;
+
+// Обработчик медианного фильтра из трех значений
+typedef struct{
+	float Buf[3];
+	uint8_t Cnt;
+}DSP_MF3_Obj;
+
 
 
 // Обработчик фильтра первого порядка
@@ -35,6 +42,7 @@ float DSP_LPF1_Handle(DSP_LPF1_Obj *hFilter, float X0);
 void DSP_MFN_Init(DSP_MFN_Obj *hFilter, float *buf, uint32_t size);
 void DSP_MFN_DeInit(DSP_MFN_Obj *hFilter);
 float DSP_MFN_Handle(DSP_MFN_Obj *hFilter, float newVal);
+float DSP_MF3_Handle(DSP_MF3_Obj *hFilter, float newVal);
 	 
 #ifdef __cplusplus
 }

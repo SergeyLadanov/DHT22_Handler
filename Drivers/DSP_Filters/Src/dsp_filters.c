@@ -69,3 +69,33 @@ float DSP_MFN_Handle(DSP_MFN_Obj *hFilter, float newVal)
 
 	return buffer[(int)hFilter->Size / 2];
 }
+
+// Функция обработки медианного фильтра для 3 значений
+float DSP_MF3_Handle(DSP_MF3_Obj *hFilter, float newVal)
+{
+	hFilter->Buf[hFilter->Cnt] = newVal;
+	hFilter->Cnt = (hFilter->Cnt + 1) % 3;
+
+	float a = hFilter->Buf[0];
+	float b = hFilter->Buf[1];
+	float c = hFilter->Buf[2];
+
+	float middle;
+
+	if ((a <= b) && (a <= c))
+	{
+		middle = (b <= c) ? b : c;
+	}
+	else
+	{
+		if ((b <= a) && (b <= c))
+		{
+			middle = (a <= c) ? a : c;
+		}
+		else
+		{
+			middle = (a <= b) ? a : b;
+		}
+	}
+	return middle;
+}
