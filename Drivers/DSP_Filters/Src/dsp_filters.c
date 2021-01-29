@@ -1,6 +1,6 @@
 #include "dsp_filters.h"
 
-// Ôóíêöèÿ Èíèöèàëèçàöèè ôèëüòðà ïåðâîãî ïîðÿäêà 
+// Ð¤ÑƒÐ½ÐºÑ†Ð¸Ñ Ð˜Ð½Ð¸Ñ†Ð¸Ð°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ð¸ Ñ„Ð¸Ð»ÑŒÑ‚Ñ€Ð° Ð¿ÐµÑ€Ð²Ð¾Ð³Ð¾ Ð¿Ð¾Ñ€ÑÐ´ÐºÐ° 
 void DSP_LPF1_Init(DSP_LPF1_Obj *hFilter, float kx0, float kx1, float ky1)
 {
     hFilter->KX0 = kx0;
@@ -10,7 +10,7 @@ void DSP_LPF1_Init(DSP_LPF1_Obj *hFilter, float kx0, float kx1, float ky1)
 	hFilter->Y1 = 0;
 }
 
-// Ôóíöèÿ îáðàáîòêè ôèëüòðà ïåðâîãî ïîðÿäêà
+// Ð¤ÑƒÐ½Ñ†Ð¸Ñ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ¸ Ñ„Ð¸Ð»ÑŒÑ‚Ñ€Ð° Ð¿ÐµÑ€Ð²Ð¾Ð³Ð¾ Ð¿Ð¾Ñ€ÑÐ´ÐºÐ°
 float DSP_LPF1_Handle(DSP_LPF1_Obj *hFilter, float X0)
 {
     float Y0 = 0.0f;
@@ -20,7 +20,7 @@ float DSP_LPF1_Handle(DSP_LPF1_Obj *hFilter, float X0)
     return Y0;
 }
 
-// Ôóíêöèÿ èíèöèàëèçàöèè ìåäèàííîãî ôèëüòðà äëÿ N çíà÷åíèé
+// Ð¤ÑƒÐ½ÐºÑ†Ð¸Ñ Ð¸Ð½Ð¸Ñ†Ð¸Ð°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ð¸ Ð¼ÐµÐ´Ð¸Ð°Ð½Ð½Ð¾Ð³Ð¾ Ñ„Ð¸Ð»ÑŒÑ‚Ñ€Ð° Ð´Ð»Ñ N Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ð¹
 uint8_t DSP_MFN_Init(DSP_MFN_Obj *hFilter, uint32_t size)
 {
     hFilter->Size = size;
@@ -35,14 +35,14 @@ uint8_t DSP_MFN_Init(DSP_MFN_Obj *hFilter, uint32_t size)
     return 0;
 }
 
-// Ôóíêöèÿ äåèíèöèàëèçàöèè ìåäèàííîãî ôèëüòðà äëÿ N çíà÷åíèé
+// Ð¤ÑƒÐ½ÐºÑ†Ð¸Ñ Ð´ÐµÐ¸Ð½Ð¸Ñ†Ð¸Ð°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ð¸ Ð¼ÐµÐ´Ð¸Ð°Ð½Ð½Ð¾Ð³Ð¾ Ñ„Ð¸Ð»ÑŒÑ‚Ñ€Ð° Ð´Ð»Ñ N Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ð¹
 void DSP_MFN_DeInit(DSP_MFN_Obj *hFilter, uint32_t size)
 {
     hFilter->Size = 0;
     free(hFilter->Buf);
 }
 
-// Ôóíêöèÿ îáðàáîòêè ìåäèàííîãî ôèëüòðà äëÿ N çíà÷åíèé
+// Ð¤ÑƒÐ½ÐºÑ†Ð¸Ñ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ¸ Ð¼ÐµÐ´Ð¸Ð°Ð½Ð½Ð¾Ð³Ð¾ Ñ„Ð¸Ð»ÑŒÑ‚Ñ€Ð° Ð´Ð»Ñ N Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ð¹
 float DSP_MFN_Handle(DSP_MFN_Obj *hFilter, float newVal)
 {
 	float *buffer = hFilter->Buf;
