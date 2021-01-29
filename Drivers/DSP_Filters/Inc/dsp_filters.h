@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 
 // Обработчик медианного фильтра
@@ -31,8 +32,8 @@ typedef struct{
 
 void DSP_LPF1_Init(DSP_LPF1_Obj *hFilter, float kx0, float kx1, float ky1);
 float DSP_LPF1_Handle(DSP_LPF1_Obj *hFilter, float X0);
-uint8_t DSP_MFN_Init(DSP_MFN_Obj *hFilter, uint32_t size);
-void DSP_MFN_DeInit(DSP_MFN_Obj *hFilter, uint32_t size);
+void DSP_MFN_Init(DSP_MFN_Obj *hFilter, float *buf, uint32_t size);
+void DSP_MFN_DeInit(DSP_MFN_Obj *hFilter);
 float DSP_MFN_Handle(DSP_MFN_Obj *hFilter, float newVal);
 	 
 #ifdef __cplusplus

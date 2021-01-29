@@ -21,25 +21,16 @@ float DSP_LPF1_Handle(DSP_LPF1_Obj *hFilter, float X0)
 }
 
 // Функция инициализации медианного фильтра для N значений
-uint8_t DSP_MFN_Init(DSP_MFN_Obj *hFilter, uint32_t size)
+void DSP_MFN_Init(DSP_MFN_Obj *hFilter, float *buf, uint32_t size)
 {
     hFilter->Size = size;
-    hFilter->Buf = (float *) malloc(sizeof(float) * hFilter->Size);
-
-    if (hFilter->Buf == NULL)
-    {
-        printf("Allocation error for DSP_MFN!\r\n");
-        return 1;
-    }
-
-    return 0;
+    hFilter->Buf = buf;
 }
 
 // Функция деинициализации медианного фильтра для N значений
-void DSP_MFN_DeInit(DSP_MFN_Obj *hFilter, uint32_t size)
+void DSP_MFN_DeInit(DSP_MFN_Obj *hFilter)
 {
-    hFilter->Size = 0;
-    free(hFilter->Buf);
+    memset(hFilter, 0, sizeof(DSP_MFN_Obj));
 }
 
 // Функция обработки медианного фильтра для N значений
