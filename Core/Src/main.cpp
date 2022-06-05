@@ -42,7 +42,7 @@ static float temperature = 0.0f;
 static float humudity = 0.0f;
 
 static MQTT_Client MQTT_Hanlder("DHT22_1");
-static DHT_Presetner dht_listener(mutex, temperature, humudity);
+static DHT_Presetner DHT_Listener(mutex, temperature, humudity);
 
 
 // Задача обработки датчика
@@ -128,7 +128,8 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 
-
+	MQTT_Hanlder.BindObserver(&DHT_Listener);
+	
 	listenfd = socket(AF_INET, SOCK_STREAM, 0);
 	memset(&serv_addr, '0', sizeof(serv_addr));
 	memset(sendBuff, '0', sizeof(sendBuff));
