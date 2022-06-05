@@ -14,6 +14,8 @@
 #include "dsp_filters.h"
 #include "dht_if.h"
 #include "datacontrol.h"
+#include "DHT_Presenter.hpp"
+
 
 // Определения для задач
 #define ERROR_CREATE_THREAD -11
@@ -32,12 +34,15 @@
 #define MEDIAN_FILTER_SIZE 10
 
 // Объект мьютекса
-pthread_mutex_t mutex;
+static pthread_mutex_t mutex;
 // Объект хранилища данных
-DC_StorageObj hdc;
+static DC_StorageObj hdc;
 
-float temperature = 0.0f;
-float humudity = 0.0f;
+static float temperature = 0.0f;
+static float humudity = 0.0f;
+
+static MQTT_Client MQTT_Hanlder("DHT22_1");
+static DHT_Presetner dht_listener(mutex, temperature, humudity);
 
 
 // Задача обработки датчика
@@ -92,7 +97,6 @@ void* dht_handle(void *args) {
 	}
 	return SUCCESS;
 }
-
 
 
 // Функция main

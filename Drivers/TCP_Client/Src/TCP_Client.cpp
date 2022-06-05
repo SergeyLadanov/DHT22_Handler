@@ -56,7 +56,7 @@ int TCP_Client::Connect(const char *host, uint16_t port)
         int err;
         #endif
         hcl->KeepLooping = true;
-        printf("Receive thread was started\r\n");
+        //printf("Receive thread was started\r\n");
 
         do
         {
@@ -92,7 +92,7 @@ int TCP_Client::Connect(const char *host, uint16_t port)
         #endif
         hcl->Fd = INVALID_SOCKET;
 
-        printf("Receive thread was stopped\r\n");
+        //printf("Receive thread was stopped\r\n");
 
         return SUCCESS;
     }
@@ -101,7 +101,7 @@ int TCP_Client::Connect(const char *host, uint16_t port)
 
     if (status != 0) 
     {
-        printf("main error: can't create thread, status = %d\n", status);
+        //printf("main error: can't create thread, status = %d\n", status);
         exit(ERROR_CREATE_THREAD);
         return -1;
     }
@@ -110,7 +110,7 @@ int TCP_Client::Connect(const char *host, uint16_t port)
     status = pthread_create(&PollTask, NULL, [] (void *args)->void*
     {
         ClientArg *hcl = (ClientArg *) args;
-        printf("Poll thread was started\r\n");
+        //printf("Poll thread was started\r\n");
 
         while(hcl->IsConnected())
         {
@@ -130,14 +130,14 @@ int TCP_Client::Connect(const char *host, uint16_t port)
         }
         hcl->KeepLooping = false;
         pthread_mutex_destroy(&hcl->Mutex);
-        printf("Connection closed\r\n");
+        //printf("Connection closed\r\n");
         return SUCCESS;
     }
     , &Hclient);
 
     if (status != 0) 
     {
-        printf("main error: can't create thread, status = %d\n", status);
+        //printf("main error: can't create thread, status = %d\n", status);
         exit(ERROR_CREATE_THREAD);
         return -1;
     }
@@ -168,9 +168,11 @@ int TCP_Client::Send(uint8_t *data, uint32_t len)
             #if defined(_WIN32) || defined(_WIN64)
             err = WSAGetLastError();
             if ((err != WSAENOTCONN) && (err != WSAECONNABORTED) && (err == WSAECONNRESET))
+            {
                 printf("Errore nella scrittura verso il client");
+            }
             #else
-                err = -1;
+            err = -1;
             #endif
             Hclient.KeepLooping = false;
             break;
