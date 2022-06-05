@@ -105,6 +105,14 @@ int main(int argc, char *argv[]) {
 	struct sockaddr_in serv_addr;
 	char sendBuff[SEND_BUL_LEN];
 
+	char *host = nullptr;
+	int port = 0;
+	char *username = nullptr;
+	char *password = nullptr;
+
+	char *temp_topic = nullptr;
+	char *hum_topic = nullptr;
+
 	pthread_t thread;
 	int status;
 	// Инициализация хранилища данных
@@ -128,8 +136,49 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 
+
+	if (argc > 1)
+    {
+        host = argv[1];
+    }
+        
+    if (argc > 2)
+    {
+        port = atoi(argv[2]);
+    }
+        
+    if (argc > 3)
+    {
+        username = argv[3];
+    }
+        
+    if (argc > 4)
+    {
+        password = argv[4];
+    }
+
+	if (argc > 5)
+    {
+        temp_topic = argv[5];
+    }
+        
+    if (argc > 6)
+    {
+        hum_topic = argv[6];
+    }
+
 	MQTT_Hanlder.BindObserver(&DHT_Listener);
-	
+
+	if (host && username && password && (port != 0))
+	{
+		MQTT_Hanlder.Begin(host, port, username, password);
+	}
+
+	if (temp_topic && hum_topic)
+	{
+		DHT_Listener.InitTopics(temp_topic, hum_topic);
+	}
+
 	listenfd = socket(AF_INET, SOCK_STREAM, 0);
 	memset(&serv_addr, '0', sizeof(serv_addr));
 	memset(sendBuff, '0', sizeof(sendBuff));
