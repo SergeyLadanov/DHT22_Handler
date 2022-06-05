@@ -13,17 +13,31 @@ enable_language(CXX C)
 add_executable(
     ${EXECUTABLE} 
     Core/Src/main.cpp
+    Core/Src/MQTT_Client.cpp
     Core/Src/datacontrol.c
     Core/Src/dht_if.c
     Drivers/DHT/Src/dht.c
-    Drivers/DSP_Filtres/Src/dsp_filtres.c
+    Drivers/DSP_Filters/Src/dsp_filters.c
+    Drivers/MQTT_Packet/MQTTConnectClient.c
+    Drivers/MQTT_Packet/MQTTConnectServer.c
+    Drivers/MQTT_Packet/MQTTDeserializePublish.c
+    Drivers/MQTT_Packet/MQTTFormat.c
+    Drivers/MQTT_Packet/MQTTPacket.c
+    Drivers/MQTT_Packet/MQTTSerializePublish.c
+    Drivers/MQTT_Packet/MQTTSubscribeClient.c
+    Drivers/MQTT_Packet/MQTTSubscribeServer.c
+    Drivers/MQTT_Packet/MQTTUnsubscribeClient.c
+    Drivers/MQTT_Packet/MQTTUnsubscribeServer.c
+    Drivers/TCP_Client/Src/TCP_Client.cpp
 )
 
 # Директории с *.h файлами
 include_directories(
     Core/Inc
     Drivers/DHT/Inc
-    Drivers/DSP_Filtres/Inc
+    Drivers/DSP_Filters/Inc
+    Drivers/TCP_Client/Inc
+    Drivers/MQTT_Packet
 )
 
 # Флаги компиляции
