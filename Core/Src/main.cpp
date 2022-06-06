@@ -14,6 +14,8 @@
 #include "dsp_filters.h"
 #include "dht_if.h"
 #include "datacontrol.h"
+#include "DHT_Presenter.hpp"
+
 
 // Определения для задач
 #define ERROR_CREATE_THREAD -11
@@ -32,12 +34,15 @@
 #define MEDIAN_FILTER_SIZE 10
 
 // Объект мьютекса
-pthread_mutex_t mutex;
+static pthread_mutex_t mutex;
 // Объект хранилища данных
-DC_StorageObj hdc;
+static DC_StorageObj hdc;
 
-float temperature = 0.0f;
-float humudity = 0.0f;
+static float temperature = 0.0f;
+static float humudity = 0.0f;
+
+static MQTT_Client MQTT_Hanlder("DHT22_1");
+static DHT_Presetner DHT_Listener(mutex, temperature, humudity);
 
 
 // Задача обработки датчика
@@ -94,12 +99,19 @@ void* dht_handle(void *args) {
 }
 
 
-
 // Функция main
 int main(int argc, char *argv[]) {
 	int listenfd = 0, connfd = 0;
 	struct sockaddr_in serv_addr;
 	char sendBuff[SEND_BUL_LEN];
+
+	char *host = nullptr;
+	int port = 0;
+	char *username = nullptr;
+	char *password = nullptr;
+
+	char *temp_topic = nullptr;
+	char *hum_topic = nullptr;
 
 	pthread_t thread;
 	int status;
@@ -124,6 +136,48 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 
+
+	if (argc > 1)
+    {
+        host = argv[1];
+    }
+        
+    if (argc > 2)
+    {
+        port = atoi(argv[2]);
+    }
+        
+    if (argc > 3)
+    {
+        username = argv[3];
+    }
+        
+    if (argc > 4)
+    {
+        password = argv[4];
+    }
+
+	if (argc > 5)
+    {
+        temp_topic = argv[5];
+    }
+        
+    if (argc > 6)
+    {
+        hum_topic = argv[6];
+    }
+
+	MQTT_Hanlder.BindObserver(&DHT_Listener);
+
+	if (host && username && password && (port != 0))
+	{
+		MQTT_Hanlder.Begin(host, port, username, password);
+	}
+
+	if (temp_topic && hum_topic)
+	{
+		DHT_Listener.InitTopics(temp_topic, hum_topic);
+	}
 
 	listenfd = socket(AF_INET, SOCK_STREAM, 0);
 	memset(&serv_addr, '0', sizeof(serv_addr));
