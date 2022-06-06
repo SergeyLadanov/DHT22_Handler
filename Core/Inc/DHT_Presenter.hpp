@@ -73,14 +73,15 @@ private:
 			if (strlen(TempTopic))
 			{
 				snprintf(Buf, sizeof(Buf), "%2.3f", Temp);
-				obj->Publish(TempTopic, Buf);
+				obj->Publish(TempTopic, 1, Buf);
 			}
 
 			if (strlen(HumTopic))
 			{
 				snprintf(Buf, sizeof(Buf), "%2.3f", Hum);
-				obj->Publish(HumTopic, Buf);
+				obj->Publish(HumTopic, 1, Buf);
 			}
+			
 			pthread_mutex_unlock(&Mutex);
 			Delay = 0;
 		}
