@@ -20,14 +20,22 @@ char* TCP_Client::DomainIP(const char *domain)
     static char str_result[32] = {0};
     struct hostent *remoteHost;
     remoteHost = gethostbyname(domain);
-    sprintf(str_result, inet_ntoa(*( struct in_addr*)remoteHost->h_addr_list[0]));
-    return str_result;
+    if (remoteHost)
+    {
+        sprintf(str_result, inet_ntoa(*( struct in_addr*)remoteHost->h_addr_list[0]));
+        return str_result;
+    }
+
+    return nullptr;
 }
 
 int TCP_Client::Connect(const char *host, uint16_t port)
 {
     int status = 0;
     struct sockaddr_in serv_addr;
+    char *IP = nullptr;
+
+    printf("Trying to connect to %s:%d...\r\n", host, port);
 
     Hclient.Fd = socket(AF_INET, SOCK_STREAM, 0);
     if (Hclient.Fd < 0)
@@ -37,12 +45,21 @@ int TCP_Client::Connect(const char *host, uint16_t port)
 
     memset((char *) &serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = inet_addr(DomainIP(host));
+    IP = DomainIP(host);
+
+    if (!IP)
+    {
+        Hclient.Fd = INVALID_SOCKET;
+        return -1;
+    }
+
+	serv_addr.sin_addr.s_addr = inet_addr(IP);
     serv_addr.sin_port = htons(port);
 
     if (connect(Hclient.Fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
-		error("ERROR connecting");
+        Hclient.Fd = INVALID_SOCKET;
+        printf("ERROR connecting!\r\n");
         return -1;
 	}
     
@@ -56,7 +73,7 @@ int TCP_Client::Connect(const char *host, uint16_t port)
         int err;
         #endif
         hcl->KeepLooping = true;
-        //printf("Receive thread was started\r\n");
+        printf("Receive thread was started\r\n");
 
         do
         {
@@ -92,7 +109,7 @@ int TCP_Client::Connect(const char *host, uint16_t port)
         #endif
         hcl->Fd = INVALID_SOCKET;
 
-        //printf("Receive thread was stopped\r\n");
+        printf("Receive thread was stopped\r\n");
 
         return SUCCESS;
     }
@@ -101,7 +118,7 @@ int TCP_Client::Connect(const char *host, uint16_t port)
 
     if (status != 0) 
     {
-        //printf("main error: can't create thread, status = %d\n", status);
+        printf("main error: can't create thread, status = %d\n", status);
         exit(ERROR_CREATE_THREAD);
         return -1;
     }
@@ -110,7 +127,7 @@ int TCP_Client::Connect(const char *host, uint16_t port)
     status = pthread_create(&PollTask, NULL, [] (void *args)->void*
     {
         ClientArg *hcl = (ClientArg *) args;
-        //printf("Poll thread was started\r\n");
+        printf("Poll thread was started\r\n");
 
         while(hcl->IsConnected())
         {
@@ -130,14 +147,14 @@ int TCP_Client::Connect(const char *host, uint16_t port)
         }
         hcl->KeepLooping = false;
         pthread_mutex_destroy(&hcl->Mutex);
-        //printf("Connection closed\r\n");
+        printf("Connection closed\r\n");
         return SUCCESS;
     }
     , &Hclient);
 
     if (status != 0) 
     {
-        //printf("main error: can't create thread, status = %d\n", status);
+        printf("main error: can't create thread, status = %d\n", status);
         exit(ERROR_CREATE_THREAD);
         return -1;
     }
@@ -160,6 +177,7 @@ int TCP_Client::Send(uint8_t *data, uint32_t len)
 {
     char *pbuf = (char *) data;
     int err = 0;
+
     do
     {
         int sent = send(Hclient.Fd, (char *) data, len, 0);
