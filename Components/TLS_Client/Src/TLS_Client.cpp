@@ -146,14 +146,16 @@ int TLS_Client::Connect(const char *host, uint16_t port)
             }
 
             if (ret == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY) {
-
+                hcl->KeepLooping = false;
             }
             else if (ret < 0) {
                 mbedtls_printf("failed\n  ! mbedtls_ssl_read returned %d\n\n", ret);
+                hcl->KeepLooping = false;
             }
 
             else if (ret == 0) {
                 mbedtls_printf("\n\nEOF\n\n");
+                hcl->KeepLooping = false;
             }
             else
             {
@@ -204,6 +206,7 @@ int TLS_Client::Connect(const char *host, uint16_t port)
         while(hcl->IsConnected())
         {
             sleep(1);
+            printf("Poll thread...\r\n");
             pthread_mutex_lock(&hcl->Mutex);
             if (hcl->Observer != nullptr)
             {
