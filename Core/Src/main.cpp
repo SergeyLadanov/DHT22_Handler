@@ -52,11 +52,12 @@ void* dht_handle(void *args) {
 	struct tm *u;
 	time_t timer;
 	// Буфер медианного фильтра температуры
-	static float mfn_temp_buf[MEDIAN_FILTER_SIZE]={0};
-	// Буфер медианного фильтра влажности
-	static float mfn_hum_buf[MEDIAN_FILTER_SIZE]={0};
+	// static float mfn_temp_buf[MEDIAN_FILTER_SIZE]={0};
+	// // Буфер медианного фильтра влажности
+	// static float mfn_hum_buf[MEDIAN_FILTER_SIZE]={0};
 
-	DSP_MFN_Obj mfnHum, mfnTemp;
+	//DSP_MFN_Obj mfnHum, mfnTemp;
+	DSP_MF3_Obj mfnHum, mfnTemp;
 	DSP_LPF1_Obj lpfHum, lpfTemp;
 	DHT_Obj hdht;
 	DHT_Result *dhtr;
@@ -65,8 +66,10 @@ void* dht_handle(void *args) {
 	printf("Thread has been started!\n");
 
 	// Инициализация медианных фильтров
-	DSP_MFN_Init(&mfnHum, mfn_hum_buf, MEDIAN_FILTER_SIZE);
-	DSP_MFN_Init(&mfnTemp, mfn_temp_buf, MEDIAN_FILTER_SIZE);
+	// DSP_MFN_Init(&mfnHum, mfn_hum_buf, MEDIAN_FILTER_SIZE);
+	// DSP_MFN_Init(&mfnTemp, mfn_temp_buf, MEDIAN_FILTER_SIZE);
+
+	
 
 	// Инициализация фнч первого порядка
 	DSP_LPF1_Init(&lpfHum, 0.03, 0.02, 0.95);
@@ -83,8 +86,8 @@ void* dht_handle(void *args) {
 		if (dhtr != NULL)
 		{
 			printf("T = %.2f H = %.2f\r\n", dhtr->Temperature, dhtr->Humidity);
-			temperature = DSP_MFN_Handle(&mfnTemp, dhtr->Temperature);
-			humudity = DSP_MFN_Handle(&mfnHum, dhtr->Humidity);
+			temperature = DSP_MF3_Handle(&mfnTemp, dhtr->Temperature);
+			humudity = DSP_MF3_Handle(&mfnHum, dhtr->Humidity);
 
 			printf("After median filtering: T = %.2f H = %.2f\r\n", temperature, humudity);
 
