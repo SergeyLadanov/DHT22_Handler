@@ -86,11 +86,12 @@ function(Depends_On name)
     message("Handle dependency \"${name}\" for \"${PROJECT_NAME}\"")
     set(dirs "")
 
+    # Get current path
+    set(path ${CMAKE_CURRENT_SOURCE_DIR})
     # Put directory name to COMPONENT_NAME variable
     get_filename_component(COMPONENT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
     if (NOT ${COMPONENT_NAME} STREQUAL ${name})
-        message("Test")
         __Get_IncludeDirectories(dirs ${COMPONENTS_DIRECTORY}/${name})
         __Get_SourceFiles(src_files ${COMPONENTS_DIRECTORY}/${name})
         target_include_directories(${PROJECT_NAME} PRIVATE ${dirs})
@@ -123,7 +124,7 @@ function(__Register_Component name)
     add_subdirectory(Components/${name})
     get_property(inc_dirs DIRECTORY ${COMPONENTS_DIRECTORY}/${name} PROPERTY INCLUDE_DIRECTORIES)
     __Get_SourceFiles(src_files ${COMPONENTS_DIRECTORY}/${name})
-    message("Include directories from component \"${name}\": \"${inc_dirs}\"")
+
     target_include_directories(${PROJECT_NAME} PRIVATE ${inc_dirs})
 
     if (src_files)
@@ -172,10 +173,6 @@ add_compile_options(
     -Os>>
 )
 
-# Для Linux
-if (UNIX)
-    target_link_libraries(${EXECUTABLE} pthread)
-    target_link_libraries(${EXECUTABLE} wiringPi)
-endif ()
+
 
                     

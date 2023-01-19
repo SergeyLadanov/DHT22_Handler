@@ -1,3 +1,9 @@
+
+#include "main.hpp"
+#include "MQTT_Client.hpp"
+#include "MQTT_Publisher.hpp"
+
+
 // #include <sys/socket.h>
 // #include <netinet/in.h>
 // #include <arpa/inet.h>
@@ -99,9 +105,24 @@ void* dht_handle(void *args) {
 }
 
 
-// Функция main
-int main(int argc, char *argv[]) {
-	int listenfd = 0, connfd = 0;
+
+// Основная программа
+int main(int argc, char *argv[])
+{
+    
+    #if defined(_WIN32) || defined(_WIN64)//Windows includes
+    int err = 0;
+    WSADATA wsaData;
+    err = WSAStartup(MAKEWORD(2,2), &wsaData);
+    if (err != 0)
+	{
+		printf("Errore in WSAStartup\n");
+        exit(-1);
+	} 
+    #endif
+
+
+    int listenfd = 0, connfd = 0;
 	struct sockaddr_in serv_addr;
 	char sendBuff[SEND_BUL_LEN];
 
@@ -122,20 +143,19 @@ int main(int argc, char *argv[]) {
 	}
 
 	pthread_mutex_init(&mutex, NULL);
-	// status = pthread_create(&thread, NULL, dht_handle, NULL);
+	status = pthread_create(&thread, NULL, dht_handle, NULL);
 
-	// if (status != 0) {
-	// 	printf("main error: can't create thread, status = %d\n", status);
-	// 	exit(ERROR_CREATE_THREAD);
+	if (status != 0) {
+		printf("main error: can't create thread, status = %d\n", status);
+		exit(ERROR_CREATE_THREAD);
 
-	// }
+	}
 	// Инициализация портов ввода вывода
 	// if ( wiringPiSetup() == -1 )
 	// {
 	// 	printf("Error of initialization wiringPi!\r\n");
 	// 	exit(1);
 	// }
-
 
 	if (argc > 1)
     {
@@ -179,29 +199,30 @@ int main(int argc, char *argv[]) {
 		DHT_Listener.InitTopics(temp_topic, hum_topic);
 	}
 
-	// listenfd = socket(AF_INET, SOCK_STREAM, 0);
-	// memset(&serv_addr, '0', sizeof(serv_addr));
-	// memset(sendBuff, '0', sizeof(sendBuff));
+	listenfd = socket(AF_INET, SOCK_STREAM, 0);
+	memset(&serv_addr, '0', sizeof(serv_addr));
+	memset(sendBuff, '0', sizeof(sendBuff));
 
-	// serv_addr.sin_family = AF_INET;
-	// serv_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-	// serv_addr.sin_port = htons(SERVER_PORT);
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	serv_addr.sin_port = htons(SERVER_PORT);
 
-	// bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+	bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
-	// listen(listenfd, 10);
+	listen(listenfd, 10);
 
 	while(1) {
 		// Ожидание подключения
-		// connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
-		// // Подготовка ответа	
-		// pthread_mutex_lock(&mutex);		                                                                                                                                      
-		// DC_GetPacket(&hdc, sendBuff, sizeof(sendBuff));
-		// pthread_mutex_unlock(&mutex);
-		// // Отправка ответа
-		// write(connfd, sendBuff, strlen(sendBuff));
-		// // Закрытие соединение
-		// close(connfd);
-		sleep(1);
+		connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
+		// Подготовка ответа	
+		pthread_mutex_lock(&mutex);		                                                                                                                                      
+		DC_GetPacket(&hdc, sendBuff, sizeof(sendBuff));
+		pthread_mutex_unlock(&mutex);
+		// Отправка ответа
+		write(connfd, sendBuff, strlen(sendBuff));
+		// Закрытие соединение
+		close(connfd);
 	}
+    
+    return 0;  
 }

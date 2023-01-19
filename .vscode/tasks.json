@@ -8,7 +8,8 @@
             "args": [
                 "cmake",
                 "--build",
-                "./build"
+                "./build",
+                "-j4"
             ],
             "problemMatcher": [
                 "$gcc"

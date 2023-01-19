@@ -69,7 +69,7 @@ private:
 
         bool IsConnected()
         {
-            return KeepLooping;
+            return (Context.fd != SOCKET_ERROR);
         }
     };
 

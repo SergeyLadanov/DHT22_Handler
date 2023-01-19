@@ -63,29 +63,29 @@ private:
 
     void MQTT_PollConnection(MQTT_Client *obj) override
     {
-        // char Buf[32];
+        char Buf[32];
 
-		// Delay++;
+		Delay++;
 
-		// if (Delay >= 3)
-		// {
-		// 	printf("Sending...\r\n");
-		// 	pthread_mutex_lock(&Mutex);
-		// 	if (strlen(TempTopic))
-		// 	{
-		// 		snprintf(Buf, sizeof(Buf), "%2.3f", 50.0f);
-		// 		obj->Publish(TempTopic, 1, Buf);
-		// 	}
+		if (Delay >= 3)
+		{
+			printf("Sending...\r\n");
+			pthread_mutex_lock(&Mutex);
+			if (strlen(TempTopic))
+			{
+				snprintf(Buf, sizeof(Buf), "%2.3f", Temp);
+				obj->Publish(TempTopic, 1, Buf);
+			}
 
-		// 	if (strlen(HumTopic))
-		// 	{
-		// 		snprintf(Buf, sizeof(Buf), "%2.3f", 51.0f);
-		// 		obj->Publish(HumTopic, 1, Buf);
-		// 	}
+			if (strlen(HumTopic))
+			{
+				snprintf(Buf, sizeof(Buf), "%2.3f", Hum);
+				obj->Publish(HumTopic, 1, Buf);
+			}
 			
-		// 	pthread_mutex_unlock(&Mutex);
-		// 	Delay = 0;
-		// }
+			pthread_mutex_unlock(&Mutex);
+			Delay = 0;
+		}
     }
 };
 

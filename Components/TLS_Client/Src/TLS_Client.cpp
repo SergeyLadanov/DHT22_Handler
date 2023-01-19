@@ -203,10 +203,9 @@ int TLS_Client::Connect(const char *host, uint16_t port)
         ClientArg *hcl = (ClientArg *) args;
         printf("Poll thread was started\r\n");
 
-        while(hcl->IsConnected())
+        while(hcl->KeepLooping)
         {
             sleep(1);
-            printf("Poll thread...\r\n");
             pthread_mutex_lock(&hcl->Mutex);
             if (hcl->Observer != nullptr)
             {
