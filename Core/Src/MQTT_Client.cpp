@@ -91,7 +91,7 @@ bool MQTT_Client::Begin(const char *host, uint16_t port, const char *username, c
             {
                 pthread_mutex_lock(&hdat->Mutex);
 
-                // printf("Conn status: %d\r\n", hdat->Tcp.IsConnected());
+                printf("Conn status: %d\r\n", hdat->Tcp.IsConnected());
                 
                 if (!hdat->Tcp.IsConnected())
                 {

@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.10)
 set(COMPONENTS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Components)
 
 # Название проекта
-project(Template)
+project(hdht)
 
 # Переменная с именем исполняемого файла
 set(EXECUTABLE ${PROJECT_NAME})
