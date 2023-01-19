@@ -6,7 +6,7 @@
 #endif
 
 #include "dht.h"
-// #include <wiringPi.h>
+#include <wiringPi.h>
 #include <unistd.h>
 
 #ifdef __cplusplus

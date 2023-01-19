@@ -3,10 +3,6 @@
 #include "MQTT_Client.hpp"
 #include "MQTT_Publisher.hpp"
 
-
-// #include <sys/socket.h>
-// #include <netinet/in.h>
-// #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -14,7 +10,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <time.h> 
-// #include <wiringPi.h>
+#include <wiringPi.h>
 #include <stdint.h>
 #include <pthread.h>
 #include "dsp_filters.h"
@@ -136,6 +132,14 @@ int main(int argc, char *argv[])
 
 	pthread_t thread;
 	int status;
+
+	// Инициализация портов ввода вывода
+	if ( wiringPiSetup() == -1 )
+	{
+		printf("Error of initialization wiringPi!\r\n");
+		exit(1);
+	}
+
 	// Инициализация хранилища данных
 	if (DC_Init(&hdc, DATA_LEN, DATA_COLLECTING_PERIOD) != 0)
 	{
@@ -150,12 +154,7 @@ int main(int argc, char *argv[])
 		exit(ERROR_CREATE_THREAD);
 
 	}
-	// Инициализация портов ввода вывода
-	// if ( wiringPiSetup() == -1 )
-	// {
-	// 	printf("Error of initialization wiringPi!\r\n");
-	// 	exit(1);
-	// }
+
 
 	if (argc > 1)
     {
