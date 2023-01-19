@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.10)
 
 # Установка папки с компонентами проекта
 set(COMPONENTS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Components)
@@ -86,10 +86,8 @@ function(Depends_On name)
     message("Handle dependency \"${name}\" for \"${PROJECT_NAME}\"")
     set(dirs "")
 
-    # Get current path
-    set(path ${CMAKE_CURRENT_SOURCE_DIR})
     # Put directory name to COMPONENT_NAME variable
-    cmake_path(GET path FILENAME COMPONENT_NAME)
+    get_filename_component(COMPONENT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
     if (NOT ${COMPONENT_NAME} STREQUAL ${name})
         message("Test")
@@ -125,7 +123,7 @@ function(__Register_Component name)
     add_subdirectory(Components/${name})
     get_property(inc_dirs DIRECTORY ${COMPONENTS_DIRECTORY}/${name} PROPERTY INCLUDE_DIRECTORIES)
     __Get_SourceFiles(src_files ${COMPONENTS_DIRECTORY}/${name})
-
+    message("Include directories from component \"${name}\": \"${inc_dirs}\"")
     target_include_directories(${PROJECT_NAME} PRIVATE ${inc_dirs})
 
     if (src_files)
@@ -176,12 +174,8 @@ add_compile_options(
 
 # Для Linux
 if (UNIX)
-    target_link_libraries(
-        ${EXECUTABLE}  
-        PUBLIC
-        pthread
-        wiringPi
-    )
+    target_link_libraries(${EXECUTABLE} pthread)
+    target_link_libraries(${EXECUTABLE} wiringPi)
 endif ()
 
                     
