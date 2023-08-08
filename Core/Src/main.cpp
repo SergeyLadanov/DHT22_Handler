@@ -10,7 +10,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <time.h> 
-#include <wiringPi.h>
+//#include <wiringPi.h>
 #include <stdint.h>
 #include <pthread.h>
 #include "dsp_filters.h"
@@ -137,11 +137,11 @@ int main(int argc, char *argv[])
 	int status;
 
 	// Инициализация портов ввода вывода
-	if ( wiringPiSetup() == -1 )
-	{
-		printf("Error of initialization wiringPi!\r\n");
-		exit(1);
-	}
+	// if ( wiringPiSetup() == -1 )
+	// {
+	// 	printf("Error of initialization wiringPi!\r\n");
+	// 	exit(1);
+	// }
 
 	// Инициализация хранилища данных
 	if (DC_Init(&hdc, DATA_LEN, DATA_COLLECTING_PERIOD) != 0)
