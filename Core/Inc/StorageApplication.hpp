@@ -1,0 +1,6 @@
+#ifndef __STORAGE_APPLICATION_HPP_
+#define __STORAGE_APPLICATION_HPP_
+
+
+
+#endif
