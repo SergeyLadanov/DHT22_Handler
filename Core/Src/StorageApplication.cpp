@@ -30,7 +30,7 @@ void StorageApplication::PutData(float temp, float hum)
 {
     struct tm *u;
 	time_t timer;
-
+    timer = time(NULL);
     u = localtime(&timer);
 	printf("Time and date: %d/%d/%d %d:%d:%d\n", u->tm_mday, u->tm_mon + 1, u->tm_year % 100, u->tm_hour, u->tm_min, u->tm_sec);
 

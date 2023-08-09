@@ -1,5 +1,9 @@
 #include "TCP_ServerApplication.hpp"
+#include <cstdio>
 
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
 #include <winsock.h>
@@ -36,21 +40,27 @@ void TCP_ServerApplication::Init(int port)
 
 void TCP_ServerApplication::Handle(void)
 {
-
+    	connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);	
+        Notify();
+		// Закрытие соединение
+		close(connfd);
 }
 
 void TCP_ServerApplication::BindObserver(IObserver *observer)
 {
-
+    Observer = observer;
 }
 
 int TCP_ServerApplication::SendData(uint8_t *buf, int len)
 {
-
+    return write(connfd, buf, len);
 }
 
 
 void TCP_ServerApplication::Notify(void)
 {
-
+    if (Observer)
+    {
+        Observer->OnTcpConnected();
+    }
 }
