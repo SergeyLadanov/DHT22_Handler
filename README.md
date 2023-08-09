@@ -1,2 +1,2 @@
-# DHT22_Handler
-ПО для получения значений температуры и влажности датчика DHT22
+# MQTT_Client_Example
+Пример реализации MQTT клиента с использованием библиотеки Paho Embedded MQTT (https://github.com/eclipse/paho.mqtt.embedded-c.git)

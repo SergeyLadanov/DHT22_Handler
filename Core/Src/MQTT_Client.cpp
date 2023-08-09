@@ -65,6 +65,15 @@ bool MQTT_Client::Publish(char *topic, unsigned char retained, char* payload, in
 }
 
 
+void MQTT_Client::SetId(const char *id)
+{
+    if (id)
+    {
+        snprintf(Id, sizeof(Id), id);
+    }
+}
+
+
 bool MQTT_Client::Begin(const char *host, uint16_t port, const char *username, const char *password)
 {
     int status = 0;
@@ -91,7 +100,7 @@ bool MQTT_Client::Begin(const char *host, uint16_t port, const char *username, c
             {
                 pthread_mutex_lock(&hdat->Mutex);
 
-                // printf("Conn status: %d\r\n", hdat->Tcp.IsConnected());
+                printf("Conn status: %d\r\n", hdat->Tcp.IsConnected());
                 
                 if (!hdat->Tcp.IsConnected())
                 {
@@ -133,7 +142,7 @@ void MQTT_Client::Stop(void)
 }
 
 
-void MQTT_Client::OnTcpReceived(TCP_Client *obj, uint8_t *buf, uint32_t len)
+void MQTT_Client::OnTcpReceived(TLS_Client *obj, uint8_t *buf, uint32_t len)
 {
     // printf("Received: %s\r\n", (char *) buf);
 
@@ -246,7 +255,7 @@ void MQTT_Client::OnTcpReceived(TCP_Client *obj, uint8_t *buf, uint32_t len)
 }
 
 
-void MQTT_Client::OnTcpConnected(TCP_Client *obj)
+void MQTT_Client::OnTcpConnected(TLS_Client *obj)
 {
     printf("MQTT Connected!\r\n");
 
@@ -269,7 +278,7 @@ void MQTT_Client::OnTcpConnected(TCP_Client *obj)
 }
 
 
-void MQTT_Client::OnTcpDisconnected(TCP_Client *obj)
+void MQTT_Client::OnTcpDisconnected(TLS_Client *obj)
 {
     printf("MQTT Disconnected!\r\n");
     if (Observer != nullptr)
@@ -279,7 +288,7 @@ void MQTT_Client::OnTcpDisconnected(TCP_Client *obj)
 }
 
 
-void MQTT_Client::TcpPollConnectionl(TCP_Client *obj)
+void MQTT_Client::TcpPollConnectionl(TLS_Client *obj)
 {
     if (Observer != nullptr)
     {
