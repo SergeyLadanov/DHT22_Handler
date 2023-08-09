@@ -55,4 +55,14 @@ add_compile_options(
 
 
 
+# Для Linux
+if (UNIX)
+    target_link_libraries(
+        ${EXECUTABLE}  
+        PUBLIC
+        pthread
+        wiringPi
+    )
+endif ()
+
                     
