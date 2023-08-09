@@ -9,8 +9,8 @@
 
 
 
-float DHT_Application::Temperature = 0.0f;
-float DHT_Application::Humudity = 0.0f;
+float DHT_Application::Temperature = 6.0f;
+float DHT_Application::Humudity = 35.0f;
 DHT_Application::IObserver* DHT_Application::Observer = nullptr;
 pthread_mutex_t DHT_Application::Mutex;
 

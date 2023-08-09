@@ -9,6 +9,8 @@
 #include "DHT_Controller.hpp"
 #include "TCP_Controller.hpp"
 #include "Model.hpp"
+#include "MQTT_Application.hpp"
+#include "MQTT_Controller.hpp"
 
 //#include <wiringPi.h>
 
@@ -19,13 +21,7 @@
 static Model DataModel;
 static DHT_Controller SensorController(DataModel);
 static TCP_Controller TCP_Listener(DataModel);
-
-// static MQTT_Client MQTT_Hanlder("DHT22_1");
-// static DHT_Presetner DHT_Listener(mutex, temperature, humudity);
-
-
-
-
+static MQTT_Controller MQTT_Handler(DataModel);
 
 
 // Основная программа
@@ -51,6 +47,7 @@ int main(int argc, char *argv[])
 
 	char *temp_topic = nullptr;
 	char *hum_topic = nullptr;
+
 
 
 	// Инициализация портов ввода вывода
@@ -99,19 +96,20 @@ int main(int argc, char *argv[])
 	StorageApplication::Init();
 	TCP_ServerApplication::Init(SERVER_PORT);
 	TCP_ServerApplication::BindObserver(&TCP_Listener);
+	MQTT_Application::Init("DHT22_1");
+	MQTT_Application::BindObserver(&MQTT_Handler);
 
-	//MQTT_Hanlder.BindObserver(&DHT_Listener);
 
-	// if (host && username && password && (port != 0))
-	// {
-	// 	MQTT_Hanlder.Begin(host, port, username, password);
-	// }
+	if (temp_topic && hum_topic)
+	{
+		MQTT_Application::SetHumTopic(hum_topic);
+		MQTT_Application::SetTempTopic(temp_topic);
+	}
 
-	// if (temp_topic && hum_topic)
-	// {
-	// 	DHT_Listener.InitTopics(temp_topic, hum_topic);
-	// }
-
+	if (host && username && password && (port != 0))
+	{
+		MQTT_Application::Begin(host, port, username, password);
+	}
 
 	while(1) 
 	{

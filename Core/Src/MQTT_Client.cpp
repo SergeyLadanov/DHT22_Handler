@@ -65,6 +65,15 @@ bool MQTT_Client::Publish(char *topic, unsigned char retained, char* payload, in
 }
 
 
+void MQTT_Client::SetId(const char *id)
+{
+    if (id)
+    {
+        snprintf(Id, sizeof(Id), id);
+    }
+}
+
+
 bool MQTT_Client::Begin(const char *host, uint16_t port, const char *username, const char *password)
 {
     int status = 0;

@@ -7,7 +7,13 @@
 class MQTT_Application
 {
 public:
-    
+    static void Begin(const char *host, uint16_t port, const char *username, const char *password);
+    static void SetHumTopic(char *topic);
+    static void SetTempTopic(char *topic);
+    static void Init(const char *id);
+    static char *GetHumTopic(void);
+    static char *GetTempTopic(void);
+    static void BindObserver(MQTT_Client::IObserver *observer);
 private:
     struct Topics_t
     {

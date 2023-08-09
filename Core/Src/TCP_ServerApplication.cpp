@@ -41,9 +41,16 @@ void TCP_ServerApplication::Init(int port)
 void TCP_ServerApplication::Handle(void)
 {
     	connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);	
+		printf("TCP connected\r\n");
         Notify();
 		// Закрытие соединение
-		close(connfd);
+		printf("Close tcp...\r\n");
+		
+		#if defined(_WIN32) || defined(_WIN64)//Windows includes
+        closesocket(connfd);
+        #else
+        close(connfd);
+        #endif
 }
 
 void TCP_ServerApplication::BindObserver(IObserver *observer)
@@ -53,7 +60,7 @@ void TCP_ServerApplication::BindObserver(IObserver *observer)
 
 int TCP_ServerApplication::SendData(uint8_t *buf, int len)
 {
-    return write(connfd, buf, len);
+    return send(connfd, (char *) buf, len, 0);
 }
 
 

@@ -41,11 +41,17 @@ private:
     IObserver *Observer = nullptr;
     char Id[32];
 public:
-    MQTT_Client(const char *id)
+    MQTT_Client(const char *id = nullptr)
     {
-        snprintf(Id, sizeof(Id), id);
+        if (id)
+        {
+            snprintf(Id, sizeof(Id), id);
+        }
+        
         Data.Tcp.BindObserver(this);
     }
+
+    void SetId(const char *id);
     bool Subscribe(char *topic, int msgid = 1);
     bool Publish(char *topic, unsigned char retained, char* payload);
     bool Publish(char *topic, unsigned char retained, char* payload, int payloadlen);
