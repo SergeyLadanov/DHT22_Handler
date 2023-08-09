@@ -98,8 +98,9 @@ void* DHT_Application::DHT_Task(void *args)
 			printf("After lpf filtering: T = %.2f H = %.2f\r\n", Temperature, Humudity);
 
             pthread_mutex_unlock(&Mutex);
-            Notify();
 		}
+
+        Notify();
 
 		sleep(2);
 	}
