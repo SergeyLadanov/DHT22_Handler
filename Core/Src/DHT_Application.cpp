@@ -20,8 +20,23 @@ void DHT_Application::Init(void)
 {
     pthread_t thread;
     int status;
+
+	// Инициализация портов ввода вывода
+	// if ( wiringPiSetup() == -1 )
+	// {
+	// 	printf("Error of initialization wiringPi!\r\n");
+	// 	exit(1);
+	// }
+
     pthread_mutex_init(&Mutex, NULL);
     status = pthread_create(&thread, NULL, DHT_Task, NULL);
+
+
+	if (status != 0) 
+	{
+		printf("main error: can't create thread, status = %d\n", status);
+		exit(ERROR_CREATE_THREAD);
+	}
 }
 
 
