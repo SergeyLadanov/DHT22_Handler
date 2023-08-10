@@ -102,7 +102,7 @@ float DC_GetTempByIndex(DC_StorageObj *hdc, uint32_t index)
 {
 	uint32_t abs_index;
 	abs_index = (hdc->WriteIndex + index) % hdc->Size;
-	return hdc->Hum[abs_index];
+	return hdc->Temp[abs_index];
 }
 
 

@@ -37,7 +37,7 @@ void TCP_Controller::GetPacket(char *buf, uint32_t len)
 	// Put hum mass
 	for (uint32_t i = 0; i < ModelRef.GetStorageSize(); i++)
 	{
-		if (ModelRef.GetStoredHumByIndex(i))
+		if (ModelRef.CheckStoredIndex(i))
 		{
 			sprintf(tmp, "%02d:%02d;", ModelRef.GetStoredHoursByIndex(i), ModelRef.GetStoredMinutesByIndex(i));
 			strcat(buf, tmp);
