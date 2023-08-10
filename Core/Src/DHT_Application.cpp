@@ -1,6 +1,6 @@
 #include "DHT_Application.hpp"
 #include "dsp_filters.h"
-#include "dht_if.h"
+#include "dht.h"
 
 // Определения для задач
 #define ERROR_CREATE_THREAD -11
