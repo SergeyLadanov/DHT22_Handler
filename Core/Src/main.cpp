@@ -1,7 +1,6 @@
 
-#include "main.hpp"
+#include "main.h"
 #include "MQTT_Client.hpp"
-#include "MQTT_Publisher.hpp"
 
 #include "DHT_Application.hpp"
 #include "StorageApplication.hpp"
@@ -12,7 +11,8 @@
 #include "MQTT_Application.hpp"
 #include "MQTT_Controller.hpp"
 
-#include <wiringPi.h>
+
+
 
 #define SERVER_PORT 9090
 
@@ -51,11 +51,13 @@ int main(int argc, char *argv[])
 
 
 	// Инициализация портов ввода вывода
+#if SIMULATOR == 0
 	if ( wiringPiSetup() == -1 )
 	{
 		printf("Error of initialization wiringPi!\r\n");
 		exit(1);
 	}
+#endif
 
 
 

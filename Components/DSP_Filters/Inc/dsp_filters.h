@@ -37,12 +37,24 @@ typedef struct{
 }DSP_LPF1_Obj;
 
 
+
+// Обработчик упрощенного фильтра Кламана
+typedef struct{
+    float Err_Measure;
+    float Q; 
+    float Err_Estimate;
+    float Last_Estimate;
+}DSP_Kalman_Obj;
+
+
 void DSP_LPF1_Init(DSP_LPF1_Obj *hFilter, float kx0, float kx1, float ky1);
 float DSP_LPF1_Handle(DSP_LPF1_Obj *hFilter, float X0);
 void DSP_MFN_Init(DSP_MFN_Obj *hFilter, float *buf, uint32_t size);
 void DSP_MFN_DeInit(DSP_MFN_Obj *hFilter);
 float DSP_MFN_Handle(DSP_MFN_Obj *hFilter, float newVal);
 float DSP_MF3_Handle(DSP_MF3_Obj *hFilter, float newVal);
+float DSP_Kalman_Init(DSP_Kalman_Obj *hFilter, float err_measure, float q);
+float DSP_Kalman_Handle(DSP_Kalman_Obj *hFilter, float newVal);
 	 
 #ifdef __cplusplus
 }

@@ -23,17 +23,10 @@ void Model::StoreData(float temp, float hum)
 }
 
 
-void Model::GetTextData(char *buf, uint32_t len)
-{
-    StorageApplication::GetStrData(buf, len);
-}
-
-
 void Model::SendTextData(char *buf, uint32_t len)
 {
     TCP_ServerApplication::SendData((uint8_t *) buf, len);
 }
-
 
 
 char *Model::GetHumTopic(void)
@@ -45,4 +38,47 @@ char *Model::GetHumTopic(void)
 char *Model::GetTempTopic(void)
 {
     return MQTT_Application::GetTempTopic();
+}
+
+
+
+float Model::GetStoredHumByIndex(uint32_t index)
+{
+    return StorageApplication::GetHumByIndex(index);
+}
+
+
+float Model::GetStoredTempByIndex(uint32_t index)
+{
+    return StorageApplication::GetTempByIndex(index);
+}
+
+
+int Model::GetStoredHoursByIndex(uint32_t index)
+{
+    return StorageApplication::GetHoursByIndex(index);
+}
+
+
+int Model::GetStoredMinutesByIndex(uint32_t index)
+{
+    return StorageApplication::GetMinutesByIndex(index);
+}
+
+
+uint8_t Model::CheckStoredIndex(uint32_t index)
+{
+    return StorageApplication::CheckIndex(index);
+}
+
+
+struct tm Model::GetTimeDate(void)
+{
+    return StorageApplication::GetTimeDate();
+}
+
+
+uint32_t Model::GetStorageSize(void)
+{
+    return StorageApplication::GetSize();
 }

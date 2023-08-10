@@ -90,48 +90,56 @@ void DC_Handle(DC_StorageObj *hdc, float t, float h, struct tm *tim)
 }
 
 
-// Функция получения пакета со значениями
-void DC_GetPacket(DC_StorageObj *hdc, char *buf, uint32_t len)
+float DC_GetHumByIndex(DC_StorageObj *hdc, uint32_t index)
 {
-	char tmp[1024];
-	uint32_t index;
-	memset(buf, 0, len);
-	sprintf(tmp, "%.1f;%.1f\r\n", hdc->CurHum, hdc->CurTemp);
-	strcat(buf, tmp);
-	sprintf(tmp, "%02d:%02d %02d/%02d/%02d\r\n", hdc->CurTime.tm_hour, hdc->CurTime.tm_min, hdc->CurTime.tm_mday, hdc->CurTime.tm_mon + 1, hdc->CurTime.tm_year % 100);
-	strcat(buf, tmp);
-	// Put temperature mass
-	for (uint32_t i = 0; i < hdc->Size; i++)
+	uint32_t abs_index;
+	abs_index = (hdc->WriteIndex + index) % hdc->Size;
+	return hdc->Hum[abs_index];
+}
+
+
+float DC_GetTempByIndex(DC_StorageObj *hdc, uint32_t index)
+{
+	uint32_t abs_index;
+	abs_index = (hdc->WriteIndex + index) % hdc->Size;
+	return hdc->Temp[abs_index];
+}
+
+
+int DC_GetHoursByIndex(DC_StorageObj *hdc, uint32_t index)
+{
+	uint32_t abs_index;
+	abs_index = (hdc->WriteIndex + index) % hdc->Size;
+	return hdc->Time[abs_index].Hours;
+}
+
+
+int DC_GetMinutesByIndex(DC_StorageObj *hdc, uint32_t index)
+{
+	uint32_t abs_index;
+	abs_index = (hdc->WriteIndex + index) % hdc->Size;
+	return hdc->Time[abs_index].Minutes;
+}
+
+
+uint8_t DC_CheckIndex(DC_StorageObj *hdc, uint32_t index)
+{
+	if ((DC_GetHoursByIndex(hdc, index) != -1) && (DC_GetMinutesByIndex(hdc, index) != -1))
 	{
-		index = (hdc->WriteIndex + i) % hdc->Size;
-		if ((hdc->Time[index].Hours != -1) && (hdc->Time[index].Minutes != -1))
-		{
-			sprintf(tmp, "%.1f;",hdc->Temp[index]);
-			strcat(buf, tmp);
-		}
+		return 1;
 	}
-	strcat(buf, "\r\n");
-	// Put hum mass
-	for (uint32_t i = 0; i < hdc->Size; i++)
-	{
-		index = (hdc->WriteIndex + i) % hdc->Size;
-		if ((hdc->Time[index].Hours != -1) && (hdc->Time[index].Minutes != -1))
-		{
-			sprintf(tmp, "%.1f;", hdc->Hum[index]);
-			strcat(buf, tmp);
-		}
-	}
-	strcat(buf, "\r\n");
-	// Put hum mass
-	for (uint32_t i = 0; i < hdc->Size; i++)
-	{
-		index = (hdc->WriteIndex + i) % hdc->Size;
-		if ((hdc->Time[index].Hours != -1) && (hdc->Time[index].Minutes != -1))
-		{
-			sprintf(tmp, "%02d:%02d;",hdc->Time[index].Hours, hdc->Time[index].Minutes);
-			strcat(buf, tmp);
-		}
-	}
-	
+
+	return 0;
+}
+
+
+struct tm DC_GetTimeDate(DC_StorageObj *hdc)
+{
+	return hdc->CurTime;
+}
+
+uint32_t DC_GetSize(DC_StorageObj *hdc)
+{
+	return hdc->Size;
 }
 

@@ -17,6 +17,8 @@ public:
 
     }
 private:
+    // Метод получения пакета со значениями
+    void GetPacket(char *buf, uint32_t len);
     void OnTcpConnected(void) override;
 };
 
