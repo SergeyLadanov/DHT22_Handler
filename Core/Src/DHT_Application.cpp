@@ -76,8 +76,8 @@ void* DHT_Application::DHT_Task(void *args)
 
 #if USE_KALMAN_FILTER != 0
 	DSP_Kalman_Obj hKalmanHum, hKalmanTemp;
-	DSP_Kalman_Init(&hKalmanHum, 1.0f, 0.0005);
-	DSP_Kalman_Init(&hKalmanTemp, 1.0f, 0.0005);
+	DSP_Kalman_Init(&hKalmanHum, 1.0f, 0.01);
+	DSP_Kalman_Init(&hKalmanTemp, 1.0f, 0.01);
 #else	
 	DSP_LPF1_Obj lpfHum, lpfTemp;
 	// Инициализация фнч первого порядка

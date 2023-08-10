@@ -63,7 +63,7 @@ DHT_Result* DHT_Read(DHT_Obj *hdht)
 		hdht->Data[4-j]=0;
 		for(i=0; i<8; i++)
 		{
-			cnt_delay = 0xFFFFFFFF;
+			cnt_delay = 50000;
 			while(DHT_PinRead(hdht) == 0)
 			{
 				cnt_delay--;
@@ -71,13 +71,14 @@ DHT_Result* DHT_Read(DHT_Obj *hdht)
 				{
 					return NULL;
 				}
+                DHT_Delay_us(hdht, 1);
 			}
 			DHT_Delay_us(hdht, 30);
 			if (DHT_PinRead(hdht) == 1)
 			{
 				hdht->Data[4-j] |= (1<<(7-i));
 			}
-			cnt_delay = 0xFFFFFFFF;
+			cnt_delay = 50000;
 			while(DHT_PinRead(hdht) == 1)
 			{
 				cnt_delay--;
@@ -85,6 +86,7 @@ DHT_Result* DHT_Read(DHT_Obj *hdht)
 				{
 					return NULL;
 				}
+                DHT_Delay_us(hdht, 1);
 			}
 		}
     }
