@@ -7,12 +7,17 @@
 #define ERROR_JOIN_THREAD   -12
 #define SUCCESS        0
 
+#define USE_KALMAN_FILTER 1
+
 
 
 float DHT_Application::Temperature = 6.0f;
 float DHT_Application::Humudity = 35.0f;
 DHT_Application::IObserver* DHT_Application::Observer = nullptr;
 pthread_mutex_t DHT_Application::Mutex;
+
+
+
 
 
 
@@ -63,29 +68,25 @@ void* DHT_Application::DHT_Task(void *args)
 {
 	struct tm *u;
 	time_t timer;
-	// Буфер медианного фильтра температуры
-	// static float mfn_temp_buf[MEDIAN_FILTER_SIZE]={0};
-	// // Буфер медианного фильтра влажности
-	// static float mfn_hum_buf[MEDIAN_FILTER_SIZE]={0};
 
-	//DSP_MFN_Obj mfnHum, mfnTemp;
 	DSP_MF3_Obj mfnHum, mfnTemp;
-	DSP_LPF1_Obj lpfHum, lpfTemp;
+	
 	DHT_Obj hdht;
 	DHT_Result *dhtr;
 
-	
-	printf("Thread has been started!\n");
-
-	// Инициализация медианных фильтров
-	// DSP_MFN_Init(&mfnHum, mfn_hum_buf, MEDIAN_FILTER_SIZE);
-	// DSP_MFN_Init(&mfnTemp, mfn_temp_buf, MEDIAN_FILTER_SIZE);
-
-	
-
+#if USE_KALMAN_FILTER != 0
+	DSP_Kalman_Obj hKalmanHum, hKalmanTemp;
+	DSP_Kalman_Init(&hKalmanHum, 1.0f, 0.0005);
+	DSP_Kalman_Init(&hKalmanTemp, 1.0f, 0.0005);
+#else	
+	DSP_LPF1_Obj lpfHum, lpfTemp;
 	// Инициализация фнч первого порядка
 	DSP_LPF1_Init(&lpfHum, 0.03, 0.02, 0.95);
 	DSP_LPF1_Init(&lpfTemp, 0.03, 0.02, 0.95);
+#endif
+
+
+	printf("DHT thread has been started!\n");
 
 	while(1)
 	{
@@ -100,8 +101,13 @@ void* DHT_Application::DHT_Task(void *args)
 
 			printf("After median filtering: T = %.2f H = %.2f\r\n", Temperature, Humudity);
 
+#if USE_KALMAN_FILTER != 0
+			Temperature = DSP_Kalman_Handle(&hKalmanTemp, Temperature);
+			Humudity = DSP_Kalman_Handle(&hKalmanHum, Humudity);
+#else
 			Temperature = DSP_LPF1_Handle(&lpfTemp, Temperature);
 			Humudity = DSP_LPF1_Handle(&lpfHum, Humudity);
+#endif
 
 			printf("After lpf filtering: T = %.2f H = %.2f\r\n", Temperature, Humudity);
 
