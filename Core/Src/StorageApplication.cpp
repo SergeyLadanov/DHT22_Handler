@@ -46,3 +46,64 @@ void StorageApplication::GetStrData(char *buf, uint32_t len)
     DC_GetPacket(&Hdc, buf, len);
     pthread_mutex_unlock(&Mutex);
 }
+
+
+
+float StorageApplication::GetHumByIndex(uint32_t index)
+{
+    float res;
+    pthread_mutex_lock(&Mutex);
+    res = DC_GetHumByIndex(&Hdc, index);
+    pthread_mutex_unlock(&Mutex);
+    return res;
+}
+
+
+float StorageApplication::GetTempByIndex(uint32_t index)
+{
+    float res;
+    pthread_mutex_lock(&Mutex);
+    res = DC_GetTempByIndex(&Hdc, index);
+    pthread_mutex_unlock(&Mutex);
+    return res;
+}
+
+
+int StorageApplication::GetHoursByIndex(uint32_t index)
+{
+    int res;
+    pthread_mutex_lock(&Mutex);
+    res = DC_GetHoursByIndex(&Hdc, index);
+    pthread_mutex_unlock(&Mutex);
+    return res;
+}
+
+
+int StorageApplication::GetMinutesByIndex(uint32_t index)
+{
+    int res;
+    pthread_mutex_lock(&Mutex);
+    res = DC_GetMinutesByIndex(&Hdc, index);
+    pthread_mutex_unlock(&Mutex);
+    return res;
+}
+
+
+uint8_t StorageApplication::CheckIndex(uint32_t index)
+{
+    uint8_t res;
+    pthread_mutex_lock(&Mutex);
+    res = DC_CheckIndex(&Hdc, index);
+    pthread_mutex_unlock(&Mutex);
+    return res;
+}
+
+
+struct tm StorageApplication::GetTimeDate(void)
+{
+    struct tm res;
+    pthread_mutex_lock(&Mutex);
+    res = DC_GetTimeDate(&Hdc);
+    pthread_mutex_unlock(&Mutex);
+    return res;
+}

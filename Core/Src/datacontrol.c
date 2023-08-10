@@ -135,3 +135,54 @@ void DC_GetPacket(DC_StorageObj *hdc, char *buf, uint32_t len)
 	
 }
 
+
+
+
+float DC_GetHumByIndex(DC_StorageObj *hdc, uint32_t index)
+{
+	uint32_t abs_index;
+	abs_index = (hdc->WriteIndex + index) % hdc->Size;
+	return hdc->Hum[abs_index];
+}
+
+
+float DC_GetTempByIndex(DC_StorageObj *hdc, uint32_t index)
+{
+	uint32_t abs_index;
+	abs_index = (hdc->WriteIndex + index) % hdc->Size;
+	return hdc->Hum[abs_index];
+}
+
+
+int DC_GetHoursByIndex(DC_StorageObj *hdc, uint32_t index)
+{
+	uint32_t abs_index;
+	abs_index = (hdc->WriteIndex + index) % hdc->Size;
+	return hdc->Time[abs_index].Hours;
+}
+
+
+int DC_GetMinutesByIndex(DC_StorageObj *hdc, uint32_t index)
+{
+	uint32_t abs_index;
+	abs_index = (hdc->WriteIndex + index) % hdc->Size;
+	return hdc->Time[abs_index].Minutes;
+}
+
+
+uint8_t DC_CheckIndex(DC_StorageObj *hdc, uint32_t index)
+{
+	if ((DC_GetHoursByIndex(hdc, index) != -1) && (DC_GetMinutesByIndex(hdc, index) != -1))
+	{
+		return 1;
+	}
+
+	return 0;
+}
+
+
+struct tm DC_GetTimeDate(DC_StorageObj *hdc)
+{
+	return hdc->CurTime;
+}
+

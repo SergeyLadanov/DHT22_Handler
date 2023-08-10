@@ -37,6 +37,12 @@ typedef struct{
 uint8_t DC_Init(DC_StorageObj *hdc, uint32_t size, uint32_t period);
 void DC_Handle(DC_StorageObj *hdc, float t, float h, struct tm *tim);
 void DC_GetPacket(DC_StorageObj *hdc, char *buf, uint32_t len);
+float DC_GetHumByIndex(DC_StorageObj *hdc, uint32_t index);
+float DC_GetTempByIndex(DC_StorageObj *hdc, uint32_t index);
+int DC_GetHoursByIndex(DC_StorageObj *hdc, uint32_t index);
+int DC_GetMinutesByIndex(DC_StorageObj *hdc, uint32_t index);
+uint8_t DC_CheckIndex(DC_StorageObj *hdc, uint32_t index);
+struct tm DC_GetTimeDate(DC_StorageObj *hdc);
 
 #ifdef __cplusplus
  }
