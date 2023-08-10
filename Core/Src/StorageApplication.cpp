@@ -40,15 +40,6 @@ void StorageApplication::PutData(float temp, float hum)
 }
 
 
-void StorageApplication::GetStrData(char *buf, uint32_t len)
-{
-    pthread_mutex_lock(&Mutex);
-    DC_GetPacket(&Hdc, buf, len);
-    pthread_mutex_unlock(&Mutex);
-}
-
-
-
 float StorageApplication::GetHumByIndex(uint32_t index)
 {
     float res;
@@ -104,6 +95,16 @@ struct tm StorageApplication::GetTimeDate(void)
     struct tm res;
     pthread_mutex_lock(&Mutex);
     res = DC_GetTimeDate(&Hdc);
+    pthread_mutex_unlock(&Mutex);
+    return res;
+}
+
+
+uint32_t StorageApplication::GetSize(void)
+{
+    uint32_t res;
+    pthread_mutex_lock(&Mutex);
+    res = DC_GetSize(&Hdc);
     pthread_mutex_unlock(&Mutex);
     return res;
 }
