@@ -1,7 +1,6 @@
 
 #include "main.h"
 #include "MQTT_Client.hpp"
-#include "MQTT_Publisher.hpp"
 
 #include "DHT_Application.hpp"
 #include "StorageApplication.hpp"
