@@ -1,4 +1,5 @@
 #include "dsp_filters.h"
+#include <math.h>
 
 // Функция Инициализации фильтра первого порядка 
 void DSP_LPF1_Init(DSP_LPF1_Obj *hFilter, float kx0, float kx1, float ky1)
@@ -98,4 +99,26 @@ float DSP_MF3_Handle(DSP_MF3_Obj *hFilter, float newVal)
 		}
 	}
 	return middle;
+}
+
+
+
+float DSP_Kalman_Init(DSP_Kalman_Obj *hFilter, float err_measure, float q)
+{
+	hFilter->Err_Measure = err_measure;
+	hFilter->Q = q;
+	hFilter->Err_Estimate = hFilter->Err_Measure;
+	hFilter->Last_Estimate = 0.0f;
+}
+
+
+float DSP_Kalman_Handle(DSP_Kalman_Obj *hFilter, float newVal)
+{
+	float kalman_gain, current_estimate;
+
+	kalman_gain = (float) hFilter->Err_Estimate / (hFilter->Err_Estimate  + hFilter->Err_Measure);
+	current_estimate = hFilter->Last_Estimate + (float) kalman_gain * (newVal - hFilter->Last_Estimate);
+	hFilter->Err_Estimate =  (1.0 - kalman_gain) * hFilter->Err_Estimate + fabs(hFilter->Last_Estimate - current_estimate) * hFilter->Q;
+	hFilter->Last_Estimate = current_estimate;
+	return current_estimate;
 }
