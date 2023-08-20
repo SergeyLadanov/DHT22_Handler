@@ -36,6 +36,12 @@ private:
     ConnStates State = STATE_NO_CON;
     char Username[32];
     char Password[32];
+    char LwtTopic[32];
+    char LwtOnlineMsg[32];
+    char LwtOfflineMsg[32];
+    uint8_t LwtRetained = 1;
+    uint8_t LwtQos = 0;
+    uint8_t UseLwt = 0;
     pthread_t KeepConnectionTask;
     DataStruct Data;
     IObserver *Observer = nullptr;
@@ -55,6 +61,8 @@ public:
     bool Subscribe(char *topic, int msgid = 1);
     bool Publish(char *topic, unsigned char retained, char* payload);
     bool Publish(char *topic, unsigned char retained, char* payload, int payloadlen);
+    void ConfigLWT(char *topic, char *online_msg, char *offline_msg, uint8_t retained, uint8_t qos);
+    void DisableLwt(void);
     bool Begin(const char *host, uint16_t port, const char *username, const char *password);
     void BindObserver(IObserver *obj);
     void Stop(void);

@@ -142,6 +142,18 @@ void MQTT_Client::Stop(void)
 }
 
 
+void MQTT_Client::ConfigLWT(char *topic, char *online_msg, char *offline_msg, uint8_t retained, uint8_t qos)
+{
+
+}
+
+
+void MQTT_Client::DisableLwt(void)
+{
+
+}
+
+
 void MQTT_Client::OnTcpReceived(TLS_Client *obj, uint8_t *buf, uint32_t len)
 {
     // printf("Received: %s\r\n", (char *) buf);
@@ -203,6 +215,9 @@ void MQTT_Client::OnTcpReceived(TLS_Client *obj, uint8_t *buf, uint32_t len)
             {
                 printf("Success connack\n");
                 State = STATE_CONN_ACK;
+
+                Publish((char *) "lwt_test", 1, (char *) "true");
+
                 if (Observer != nullptr)
                 {
                     Observer->MQTT_OnConnected(this);
@@ -272,6 +287,11 @@ void MQTT_Client::OnTcpConnected(TLS_Client *obj)
     data.username.cstring = Username;
     data.password.cstring = Password;
 
+    data.willFlag = 1;
+    data.will.retained = 1;
+    data.will.topicName.cstring = (char *) "lwt_test";
+    data.will.message.cstring = (char *) "false";
+
     len = MQTTSerialize_connect(buf, buflen, &data);
 
     obj->Send((uint8_t *) buf, len);
@@ -286,6 +306,9 @@ void MQTT_Client::OnTcpDisconnected(TLS_Client *obj)
         Observer->MQTT_OnDisconnected(this);
     }
 }
+
+
+
 
 
 void MQTT_Client::TcpPollConnectionl(TLS_Client *obj)
