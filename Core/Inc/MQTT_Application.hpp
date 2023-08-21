@@ -13,7 +13,6 @@ public:
     static void SetTempTopic(char *topic);
     static void Init(const char *id);
     static void SetMsgOnline(char *msg);
-    static void SetMsgOffline(char *msg);
     static char *GetHumTopic(void);
     static char *GetTempTopic(void);
     static char *GetLwtTopic(void);

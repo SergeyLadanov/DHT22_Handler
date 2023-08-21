@@ -36,8 +36,6 @@ void MQTT_Application::SetTempTopic(char *topic)
 }
 
 
-
-
 void MQTT_Application::Init(const char *id)
 {
     MQTT_Hanlder.SetId(id);
@@ -60,3 +58,27 @@ void MQTT_Application::BindObserver(MQTT_Client::IObserver *observer)
 {
     MQTT_Hanlder.BindObserver(observer);
 }
+
+
+void MQTT_Application::SetMsgOnline(char *msg)
+{
+    snprintf(WillOnlineMsg, sizeof(WillOnlineMsg), msg);
+}
+
+
+char *MQTT_Application::GetLwtTopic(void)
+{
+    return Topics.WillTopic;
+}
+
+
+char *MQTT_Application::GetOnlineMsg(void)
+{
+    return WillOnlineMsg;
+}
+
+
+char *MQTT_Application::GetOfflineMsg(void)
+{
+    return WillOfflineMsg;
+}  

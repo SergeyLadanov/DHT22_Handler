@@ -13,6 +13,8 @@ public:
     void SendTextData(char *buf, uint32_t len);
     char *GetHumTopic(void);
     char *GetTempTopic(void);
+    char *GetLwtTopic(void);
+    char *GetLwtOnlineMsg(void);
     float GetStoredHumByIndex(uint32_t index);
     float GetStoredTempByIndex(uint32_t index);
     int GetStoredHoursByIndex(uint32_t index);

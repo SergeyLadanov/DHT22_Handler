@@ -99,6 +99,7 @@ int main(int argc, char *argv[])
 	TCP_ServerApplication::Init(SERVER_PORT);
 	TCP_ServerApplication::BindObserver(&TCP_Listener);
 	MQTT_Application::Init("DHT22_1");
+	MQTT_Application::SetMsgOnline((char *) "true");
 	MQTT_Application::BindObserver(&MQTT_Handler);
 
 
@@ -110,7 +111,7 @@ int main(int argc, char *argv[])
 
 	if (host && username && password && (port != 0))
 	{
-		MQTT_Application::Begin(host, port, username, password);
+		MQTT_Application::Begin(host, port, username, password, "dht/lwt", "false");
 	}
 
 	while(1) 

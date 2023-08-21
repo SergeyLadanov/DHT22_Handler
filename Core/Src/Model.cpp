@@ -41,6 +41,17 @@ char *Model::GetTempTopic(void)
 }
 
 
+char *Model::GetLwtTopic(void)
+{
+    return MQTT_Application::GetLwtTopic();
+}
+
+
+char *Model::GetLwtOnlineMsg(void)
+{
+    return MQTT_Application::GetOnlineMsg();
+}
+
 
 float Model::GetStoredHumByIndex(uint32_t index)
 {

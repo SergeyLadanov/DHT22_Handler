@@ -7,7 +7,13 @@ uint32_t MQTT_Controller::Delay = 0;
 
 void MQTT_Controller::MQTT_OnConnected(MQTT_Client *obj)
 {
-    UNUSED(obj);
+	if (strlen(ModelRef.GetLwtTopic()))
+	{
+		if (strlen(ModelRef.GetLwtOnlineMsg()))
+		{
+			obj->Publish(ModelRef.GetLwtTopic(), 1, ModelRef.GetLwtOnlineMsg());
+		}
+	}
 }
 
 
