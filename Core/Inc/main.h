@@ -7,7 +7,7 @@ extern "C"
 {
 #endif
 
-#define SIMULATOR 0
+#define SIMULATOR 1
 
 
 #if SIMULATOR == 0

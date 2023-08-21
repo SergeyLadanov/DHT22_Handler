@@ -74,13 +74,32 @@ void MQTT_Client::SetId(const char *id)
 }
 
 
-bool MQTT_Client::Begin(const char *host, uint16_t port, const char *username, const char *password)
+bool MQTT_Client::Begin(const char *host, uint16_t port, const char *username, const char *password, const char* willTopic, uint8_t willQos, boolean willRetain, const char* willMessage)
 {
     int status = 0;
     snprintf(Data.Host, sizeof(Data.Host), host);
     Data.Port = port;
     snprintf(Username, sizeof(Username), username);
     snprintf(Password, sizeof(Password), password);
+
+
+    if (willTopic)
+    {
+        UseLwt = 1;
+        snprintf(WillTopic, sizeof(WillTopic), willTopic);
+        WillQos = willQos;
+        WillRetained = willRetain;
+
+        if (willMessage)
+        {
+            snprintf(WillMsg, sizeof(WillMsg), willMessage);
+        }
+    }
+    else
+    {
+        UseLwt = 0;
+    }
+    
 
     pthread_mutex_init(&Data.Mutex, NULL);
     
@@ -142,16 +161,9 @@ void MQTT_Client::Stop(void)
 }
 
 
-void MQTT_Client::ConfigLWT(char *topic, char *online_msg, char *offline_msg, uint8_t retained, uint8_t qos)
-{
-
-}
 
 
-void MQTT_Client::DisableLwt(void)
-{
 
-}
 
 
 void MQTT_Client::OnTcpReceived(TLS_Client *obj, uint8_t *buf, uint32_t len)
@@ -215,8 +227,6 @@ void MQTT_Client::OnTcpReceived(TLS_Client *obj, uint8_t *buf, uint32_t len)
             {
                 printf("Success connack\n");
                 State = STATE_CONN_ACK;
-
-                Publish((char *) "lwt_test", 1, (char *) "true");
 
                 if (Observer != nullptr)
                 {
@@ -287,10 +297,10 @@ void MQTT_Client::OnTcpConnected(TLS_Client *obj)
     data.username.cstring = Username;
     data.password.cstring = Password;
 
-    data.willFlag = 1;
-    data.will.retained = 1;
-    data.will.topicName.cstring = (char *) "lwt_test";
-    data.will.message.cstring = (char *) "false";
+    data.willFlag = UseLwt;
+    data.will.retained = WillRetained;
+    data.will.topicName.cstring = WillTopic;
+    data.will.message.cstring = WillMsg;
 
     len = MQTTSerialize_connect(buf, buflen, &data);
 
