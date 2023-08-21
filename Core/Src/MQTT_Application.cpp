@@ -3,6 +3,8 @@
 
 MQTT_Client MQTT_Application::MQTT_Hanlder("none");
 MQTT_Application::Topics_t MQTT_Application::Topics;
+char MQTT_Application::WillOnlineMsg[];
+char MQTT_Application::WillOfflineMsg[];
 
 
 
@@ -10,6 +12,15 @@ MQTT_Application::Topics_t MQTT_Application::Topics;
 void MQTT_Application::Begin(const char *host, uint16_t port, const char *username, const char *password)
 {
     MQTT_Hanlder.Begin(host, port, username, password);
+}
+
+
+void MQTT_Application::Begin(const char *host, uint16_t port, const char *username, const char *password, const char* willTopic, const char* willMessage)
+{
+    snprintf(Topics.WillTopic, sizeof(Topics.WillTopic), willTopic);
+    snprintf(WillOfflineMsg, sizeof(WillOfflineMsg), willMessage);
+    
+    MQTT_Hanlder.Begin(host, port, username, password, Topics.WillTopic, 0, 1, WillOfflineMsg);
 }
 
 
@@ -23,6 +34,8 @@ void MQTT_Application::SetTempTopic(char *topic)
 {
     snprintf(Topics.TempTopic, sizeof(Topics.TempTopic), topic);
 }
+
+
 
 
 void MQTT_Application::Init(const char *id)
