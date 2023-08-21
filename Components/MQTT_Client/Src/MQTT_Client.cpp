@@ -74,7 +74,7 @@ void MQTT_Client::SetId(const char *id)
 }
 
 
-bool MQTT_Client::Begin(const char *host, uint16_t port, const char *username, const char *password, const char* willTopic, uint8_t willQos, boolean willRetain, const char* willMessage)
+bool MQTT_Client::Begin(const char *host, uint16_t port, const char *username, const char *password, const char* willTopic, uint8_t willQos, uint8_t willRetain, const char* willMessage)
 {
     int status = 0;
     snprintf(Data.Host, sizeof(Data.Host), host);

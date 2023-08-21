@@ -60,7 +60,7 @@ public:
     bool Subscribe(char *topic, int msgid = 1);
     bool Publish(char *topic, unsigned char retained, char* payload);
     bool Publish(char *topic, unsigned char retained, char* payload, int payloadlen);
-    bool Begin(const char *host, uint16_t port, const char *username, const char *password, const char* willTopic = nullptr, uint8_t willQos = 0, boolean willRetain = 0, const char* willMessage = nullptr);
+    bool Begin(const char *host, uint16_t port, const char *username, const char *password, const char* willTopic = nullptr, uint8_t willQos = 0, uint8_t willRetain = 0, const char* willMessage = nullptr);
     void BindObserver(IObserver *obj);
     void Stop(void);
 private:
