@@ -48,6 +48,10 @@ int main(int argc, char *argv[])
 	char *temp_topic = nullptr;
 	char *hum_topic = nullptr;
 
+	char *lwt_topic = nullptr;
+	char *lwt_online_msg = nullptr;
+	char *lwt_offline_msg = nullptr;
+
 
 
 	// Инициализация портов ввода вывода
@@ -92,6 +96,21 @@ int main(int argc, char *argv[])
         hum_topic = argv[6];
     }
 
+	if (argc > 7)
+    {
+        lwt_topic = argv[7];
+    }
+
+	if (argc > 8)
+    {
+        lwt_online_msg = argv[8];
+    }
+
+	if (argc > 9)
+    {
+        lwt_offline_msg = argv[9];
+    }
+
 
 	DHT_Application::Init();
 	DHT_Application::BindObserver(&SensorController);
@@ -110,7 +129,16 @@ int main(int argc, char *argv[])
 
 	if (host && username && password && (port != 0))
 	{
-		MQTT_Application::Begin(host, port, username, password);
+		if (lwt_topic && lwt_online_msg && lwt_offline_msg)
+		{
+			MQTT_Application::SetMsgOnline(lwt_online_msg);
+			MQTT_Application::Begin(host, port, username, password, lwt_topic, lwt_offline_msg);
+		}
+		else
+		{
+			MQTT_Application::Begin(host, port, username, password);
+		}
+		
 	}
 
 	while(1) 

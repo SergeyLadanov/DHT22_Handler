@@ -74,13 +74,32 @@ void MQTT_Client::SetId(const char *id)
 }
 
 
-bool MQTT_Client::Begin(const char *host, uint16_t port, const char *username, const char *password)
+bool MQTT_Client::Begin(const char *host, uint16_t port, const char *username, const char *password, const char* willTopic, uint8_t willQos, boolean willRetain, const char* willMessage)
 {
     int status = 0;
     snprintf(Data.Host, sizeof(Data.Host), host);
     Data.Port = port;
     snprintf(Username, sizeof(Username), username);
     snprintf(Password, sizeof(Password), password);
+
+
+    if (willTopic)
+    {
+        UseLwt = 1;
+        snprintf(WillTopic, sizeof(WillTopic), willTopic);
+        WillQos = willQos;
+        WillRetained = willRetain;
+
+        if (willMessage)
+        {
+            snprintf(WillMsg, sizeof(WillMsg), willMessage);
+        }
+    }
+    else
+    {
+        UseLwt = 0;
+    }
+    
 
     pthread_mutex_init(&Data.Mutex, NULL);
     
@@ -140,6 +159,11 @@ void MQTT_Client::Stop(void)
     Data.KeepLooping = false;
     pthread_mutex_unlock(&Data.Mutex);
 }
+
+
+
+
+
 
 
 void MQTT_Client::OnTcpReceived(TLS_Client *obj, uint8_t *buf, uint32_t len)
@@ -203,6 +227,7 @@ void MQTT_Client::OnTcpReceived(TLS_Client *obj, uint8_t *buf, uint32_t len)
             {
                 printf("Success connack\n");
                 State = STATE_CONN_ACK;
+
                 if (Observer != nullptr)
                 {
                     Observer->MQTT_OnConnected(this);
@@ -272,6 +297,11 @@ void MQTT_Client::OnTcpConnected(TLS_Client *obj)
     data.username.cstring = Username;
     data.password.cstring = Password;
 
+    data.willFlag = UseLwt;
+    data.will.retained = WillRetained;
+    data.will.topicName.cstring = WillTopic;
+    data.will.message.cstring = WillMsg;
+
     len = MQTTSerialize_connect(buf, buflen, &data);
 
     obj->Send((uint8_t *) buf, len);
@@ -286,6 +316,9 @@ void MQTT_Client::OnTcpDisconnected(TLS_Client *obj)
         Observer->MQTT_OnDisconnected(this);
     }
 }
+
+
+
 
 
 void MQTT_Client::TcpPollConnectionl(TLS_Client *obj)

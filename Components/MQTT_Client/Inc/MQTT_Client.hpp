@@ -36,6 +36,11 @@ private:
     ConnStates State = STATE_NO_CON;
     char Username[32];
     char Password[32];
+    uint8_t UseLwt = 0;
+    char WillTopic[32];
+    char WillMsg[32];
+    uint8_t WillRetained = 1;
+    uint8_t WillQos = 0;
     pthread_t KeepConnectionTask;
     DataStruct Data;
     IObserver *Observer = nullptr;
@@ -55,7 +60,7 @@ public:
     bool Subscribe(char *topic, int msgid = 1);
     bool Publish(char *topic, unsigned char retained, char* payload);
     bool Publish(char *topic, unsigned char retained, char* payload, int payloadlen);
-    bool Begin(const char *host, uint16_t port, const char *username, const char *password);
+    bool Begin(const char *host, uint16_t port, const char *username, const char *password, const char* willTopic = nullptr, uint8_t willQos = 0, boolean willRetain = 0, const char* willMessage = nullptr);
     void BindObserver(IObserver *obj);
     void Stop(void);
 private:
