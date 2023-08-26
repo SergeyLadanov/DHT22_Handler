@@ -3,7 +3,7 @@
 #include "main.h"
 
 
-#define DHT_PIN 7
+
 
 void DHT_PinMode(DHT_Obj *hdht, uint8_t mode)
 {

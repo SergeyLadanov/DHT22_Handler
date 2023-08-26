@@ -3,6 +3,13 @@ cmake_minimum_required(VERSION 3.10)
 # Название проекта
 project(hdht)
 
+set(SIMULATOR, 0)
+
+if ("$ENV{USE_SIMULATOR}" GREATER "0")
+set(SIMULATOR, 1)
+message(STATUS "Use simulator build")
+endif()
+
 # Переменная с именем исполняемого файла
 set(EXECUTABLE ${PROJECT_NAME})
 
@@ -57,12 +64,21 @@ add_compile_options(
 
 # Для Linux
 if (UNIX)
-    target_link_libraries(
-        ${EXECUTABLE}  
-        PUBLIC
-        pthread
-        wiringPi
-    )
+    if ("$ENV{USE_SIMULATOR}" GREATER "0")
+        message(STATUS "Use simulator building")
+        target_link_libraries(
+            ${EXECUTABLE}  
+            PUBLIC
+            pthread
+        )
+    else()
+        target_link_libraries(
+            ${EXECUTABLE}  
+            PUBLIC
+            pthread
+            wiringPi
+        ) 
+    endif()
 endif ()
 
                     
