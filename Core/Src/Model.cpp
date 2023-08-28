@@ -8,89 +8,83 @@
 
 float Model::GetTemperature(void)
 {
-    return App::DHT().GetTemperature();
+    return App::GetDHT().GetTemperature();
 }
 
 
 float Model::GetHumidity(void)
 {
-    return App::DHT().GetHumidity();
+    return App::GetDHT().GetHumidity();
 }
 
 
 void Model::StoreData(float temp, float hum)
 {
-    App::DataStorage().PutData(temp, hum);
-}
-
-
-void Model::SendTextData(char *buf, uint32_t len)
-{
-    TCP_ServerApplication::SendData((uint8_t *) buf, len);
+    App::GetDataStorage().PutData(temp, hum);
 }
 
 
 char *Model::GetHumTopic(void)
 {
-    return App::MQTT().GetHumTopic();
+    return App::GetMQTT().GetHumTopic();
 }
 
 
 char *Model::GetTempTopic(void)
 {
-    return App::MQTT().GetTempTopic();
+    return App::GetMQTT().GetTempTopic();
 }
 
 
 char *Model::GetLwtTopic(void)
 {
-    return App::MQTT().GetLwtTopic();
+    return App::GetMQTT().GetLwtTopic();
 }
 
 
 char *Model::GetLwtOnlineMsg(void)
 {
-    return App::MQTT().GetOnlineMsg();
+    return App::GetMQTT().GetOnlineMsg();
 }
 
 
 float Model::GetStoredHumByIndex(uint32_t index)
 {
-    return App::DataStorage().GetHumByIndex(index);
+    return App::GetDataStorage().GetHumByIndex(index);
 }
 
 
 float Model::GetStoredTempByIndex(uint32_t index)
 {
-    return App::DataStorage().GetTempByIndex(index);
+    return App::GetDataStorage().GetTempByIndex(index);
 }
 
 
 int Model::GetStoredHoursByIndex(uint32_t index)
 {
-    return App::DataStorage().GetHoursByIndex(index);
+    return App::GetDataStorage().GetHoursByIndex(index);
 }
 
 
 int Model::GetStoredMinutesByIndex(uint32_t index)
 {
-    return App::DataStorage().GetMinutesByIndex(index);
+    return App::GetDataStorage().GetMinutesByIndex(index);
 }
 
 
 uint8_t Model::CheckStoredIndex(uint32_t index)
 {
-    return App::DataStorage().CheckIndex(index);
+    return App::GetDataStorage().CheckIndex(index);
 }
 
 
 struct tm Model::GetTimeDate(void)
 {
-    return App::DataStorage().GetTimeDate();
+    return App::GetDataStorage().GetTimeDate();
 }
 
 
 uint32_t Model::GetStorageSize(void)
 {
-    return App::DataStorage().GetSize();
+    return App::GetDataStorage().GetSize();
 }

@@ -11,19 +11,19 @@ public:
     class IObserver
     {
     public:
-        virtual void OnTcpConnected(void) = 0;
+        virtual void OnTcpConnected(TCP_ServerApplication *obj) = 0;
     };
 
-    static void Init(int port);
-    static void BindObserver(IObserver *observer);
-    static int SendData(uint8_t *buf, int len);
-    static void Handle(void);
+    void Init(int port);
+    void BindObserver(IObserver *observer);
+    int SendData(uint8_t *buf, int len);
+    void Handle(void);
 private:
 
-    static void Notify(void);
+    void Notify(void);
 
-    static int listenfd, connfd;
-    static IObserver *Observer;
+    int listenfd = 0, connfd = 0;
+    IObserver *Observer = nullptr;
 };
 
 #endif

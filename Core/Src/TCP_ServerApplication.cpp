@@ -16,10 +16,6 @@
 
 
 
-int TCP_ServerApplication::listenfd = 0;
-int TCP_ServerApplication::connfd = 0;
-TCP_ServerApplication::IObserver *TCP_ServerApplication::Observer = nullptr;
-
 
 
 void TCP_ServerApplication::Init(int port)
@@ -68,6 +64,6 @@ void TCP_ServerApplication::Notify(void)
 {
     if (Observer)
     {
-        Observer->OnTcpConnected();
+        Observer->OnTcpConnected(this);
     }
 }

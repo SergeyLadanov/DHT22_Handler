@@ -47,8 +47,8 @@ void TCP_Controller::GetPacket(char *buf, uint32_t len)
 }
 
 
-void TCP_Controller::OnTcpConnected(void)
+void TCP_Controller::OnTcpConnected(TCP_ServerApplication *obj)
 {
     GetPacket(SendBuf, sizeof(SendBuf));
-    ModelRef.SendTextData(SendBuf, strlen(SendBuf));
+    obj->SendData((uint8_t *) SendBuf, strlen(SendBuf));
 }

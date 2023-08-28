@@ -113,38 +113,38 @@ int main(int argc, char *argv[])
     }
 
 
-	App::DHT().Init();
-	App::DHT().BindObserver(&SensorController);
-	App::DataStorage().Init();
-	TCP_ServerApplication::Init(SERVER_PORT);
-	TCP_ServerApplication::BindObserver(&TCP_Listener);
-	App::MQTT().Init("DHT22_1");
-	App::MQTT().BindObserver(&MQTT_Handler);
+	App::GetDHT().Init();
+	App::GetDHT().BindObserver(&SensorController);
+	App::GetDataStorage().Init();
+	App::GetTCPServer().Init(SERVER_PORT);
+	App::GetTCPServer().BindObserver(&TCP_Listener);
+	App::GetMQTT().Init("DHT22_1");
+	App::GetMQTT().BindObserver(&MQTT_Handler);
 
 
 	if (temp_topic && hum_topic)
 	{
-		App::MQTT().SetHumTopic(hum_topic);
-		App::MQTT().SetTempTopic(temp_topic);
+		App::GetMQTT().SetHumTopic(hum_topic);
+		App::GetMQTT().SetTempTopic(temp_topic);
 	}
 
 	if (host && username && password && (port != 0))
 	{
 		if (lwt_topic && lwt_online_msg && lwt_offline_msg)
 		{
-			App::MQTT().SetMsgOnline(lwt_online_msg);
-			App::MQTT().Begin(host, port, username, password, lwt_topic, lwt_offline_msg);
+			App::GetMQTT().SetMsgOnline(lwt_online_msg);
+			App::GetMQTT().Begin(host, port, username, password, lwt_topic, lwt_offline_msg);
 		}
 		else
 		{
-			App::MQTT().Begin(host, port, username, password);
+			App::GetMQTT().Begin(host, port, username, password);
 		}
 		
 	}
 
 	while(1) 
 	{
-		TCP_ServerApplication::Handle();
+		App::GetTCPServer().Handle();
 	}	
     
     return 0;  
