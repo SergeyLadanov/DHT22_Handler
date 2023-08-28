@@ -11,23 +11,13 @@
 
 
 
-float DHT_Application::Temperature = 6.0f;
-float DHT_Application::Humudity = 35.0f;
-DHT_Application::IObserver* DHT_Application::Observer = nullptr;
-pthread_mutex_t DHT_Application::Mutex;
-
-
-
-
-
-
 void DHT_Application::Init(void)
 {
     pthread_t thread;
     int status;
 
     pthread_mutex_init(&Mutex, NULL);
-    status = pthread_create(&thread, NULL, DHT_Task, NULL);
+    status = pthread_create(&thread, NULL, DHT_Task, this);
 
 
 	if (status != 0) 
@@ -66,6 +56,7 @@ void DHT_Application::BindObserver(IObserver *observer)
 
 void* DHT_Application::DHT_Task(void *args)
 {
+	DHT_Application *obj = (DHT_Application *) args;
 	struct tm *u;
 	time_t timer;
 
@@ -94,27 +85,27 @@ void* DHT_Application::DHT_Task(void *args)
 
 		if (dhtr != NULL)
 		{
-            pthread_mutex_lock(&Mutex);
+            pthread_mutex_lock(&obj->Mutex);
 			printf("T = %.2f H = %.2f\r\n", dhtr->Temperature, dhtr->Humidity);
-			Temperature = DSP_MF3_Handle(&mfnTemp, dhtr->Temperature);
-			Humudity = DSP_MF3_Handle(&mfnHum, dhtr->Humidity);
+			obj->Temperature = DSP_MF3_Handle(&mfnTemp, dhtr->Temperature);
+			obj->Humudity = DSP_MF3_Handle(&mfnHum, dhtr->Humidity);
 
-			printf("After median filtering: T = %.2f H = %.2f\r\n", Temperature, Humudity);
+			printf("After median filtering: T = %.2f H = %.2f\r\n", obj->Temperature, obj->Humudity);
 
 #if USE_KALMAN_FILTER != 0
-			Temperature = DSP_Kalman_Handle(&hKalmanTemp, Temperature);
-			Humudity = DSP_Kalman_Handle(&hKalmanHum, Humudity);
+			obj->Temperature = DSP_Kalman_Handle(&hKalmanTemp, obj->Temperature);
+			obj->Humudity = DSP_Kalman_Handle(&hKalmanHum,obj->Humudity);
 #else
 			Temperature = DSP_LPF1_Handle(&lpfTemp, Temperature);
 			Humudity = DSP_LPF1_Handle(&lpfHum, Humudity);
 #endif
 
-			printf("After lpf filtering: T = %.2f H = %.2f\r\n", Temperature, Humudity);
+			printf("After lpf filtering: T = %.2f H = %.2f\r\n", obj->Temperature, obj->Humudity);
 
-            pthread_mutex_unlock(&Mutex);
+            pthread_mutex_unlock(&obj->Mutex);
 		}
 
-        Notify();
+        obj->Notify();
 
 		sleep(2);
 	}
@@ -125,6 +116,6 @@ void DHT_Application::Notify(void)
 {
     if (Observer)
     {
-        Observer->DHT_OnDataReady();
+        Observer->DHT_OnDataReady(this);
     }
 }

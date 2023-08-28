@@ -10,7 +10,7 @@ extern "C"
 #include "config.h"
 
 #ifndef SIMULATOR
-#define SIMULATOR 0
+#define SIMULATOR 1
 #endif
 
 

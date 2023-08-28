@@ -1,10 +1,6 @@
 #include "MQTT_Application.hpp"
 
 
-MQTT_Client MQTT_Application::MQTT_Hanlder("none");
-MQTT_Application::Topics_t MQTT_Application::Topics;
-char MQTT_Application::WillOnlineMsg[];
-char MQTT_Application::WillOfflineMsg[];
 
 
 

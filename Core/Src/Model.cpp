@@ -3,23 +3,24 @@
 #include "StorageApplication.hpp"
 #include "TCP_ServerApplication.hpp"
 #include "MQTT_Application.hpp"
+#include "App.hpp"
 
 
 float Model::GetTemperature(void)
 {
-    return DHT_Application::GetTemperature();
+    return App::DHT().GetTemperature();
 }
 
 
 float Model::GetHumidity(void)
 {
-    return DHT_Application::GetHumidity();
+    return App::DHT().GetHumidity();
 }
 
 
 void Model::StoreData(float temp, float hum)
 {
-    StorageApplication::PutData(temp, hum);
+    App::DataStorage().PutData(temp, hum);
 }
 
 
@@ -31,65 +32,65 @@ void Model::SendTextData(char *buf, uint32_t len)
 
 char *Model::GetHumTopic(void)
 {
-    return MQTT_Application::GetHumTopic();
+    return App::MQTT().GetHumTopic();
 }
 
 
 char *Model::GetTempTopic(void)
 {
-    return MQTT_Application::GetTempTopic();
+    return App::MQTT().GetTempTopic();
 }
 
 
 char *Model::GetLwtTopic(void)
 {
-    return MQTT_Application::GetLwtTopic();
+    return App::MQTT().GetLwtTopic();
 }
 
 
 char *Model::GetLwtOnlineMsg(void)
 {
-    return MQTT_Application::GetOnlineMsg();
+    return App::MQTT().GetOnlineMsg();
 }
 
 
 float Model::GetStoredHumByIndex(uint32_t index)
 {
-    return StorageApplication::GetHumByIndex(index);
+    return App::DataStorage().GetHumByIndex(index);
 }
 
 
 float Model::GetStoredTempByIndex(uint32_t index)
 {
-    return StorageApplication::GetTempByIndex(index);
+    return App::DataStorage().GetTempByIndex(index);
 }
 
 
 int Model::GetStoredHoursByIndex(uint32_t index)
 {
-    return StorageApplication::GetHoursByIndex(index);
+    return App::DataStorage().GetHoursByIndex(index);
 }
 
 
 int Model::GetStoredMinutesByIndex(uint32_t index)
 {
-    return StorageApplication::GetMinutesByIndex(index);
+    return App::DataStorage().GetMinutesByIndex(index);
 }
 
 
 uint8_t Model::CheckStoredIndex(uint32_t index)
 {
-    return StorageApplication::CheckIndex(index);
+    return App::DataStorage().CheckIndex(index);
 }
 
 
 struct tm Model::GetTimeDate(void)
 {
-    return StorageApplication::GetTimeDate();
+    return App::DataStorage().GetTimeDate();
 }
 
 
 uint32_t Model::GetStorageSize(void)
 {
-    return StorageApplication::GetSize();
+    return App::DataStorage().GetSize();
 }

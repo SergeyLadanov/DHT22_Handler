@@ -11,10 +11,6 @@
 
 
 
-DC_StorageObj StorageApplication::Hdc;
-pthread_mutex_t StorageApplication::Mutex;
-
-
 void StorageApplication::Init(void)
 {
 	if (DC_Init(&Hdc, DATA_LEN, DATA_COLLECTING_PERIOD) != 0)
