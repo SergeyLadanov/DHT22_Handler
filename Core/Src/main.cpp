@@ -1,5 +1,6 @@
 
 #include "main.h"
+#include "App.hpp"
 #include "MQTT_Client.hpp"
 
 #include "DHT_Application.hpp"
@@ -112,38 +113,38 @@ int main(int argc, char *argv[])
     }
 
 
-	DHT_Application::Init();
-	DHT_Application::BindObserver(&SensorController);
-	StorageApplication::Init();
-	TCP_ServerApplication::Init(SERVER_PORT);
-	TCP_ServerApplication::BindObserver(&TCP_Listener);
-	MQTT_Application::Init("DHT22_1");
-	MQTT_Application::BindObserver(&MQTT_Handler);
+	App::GetDHT().Init();
+	App::GetDHT().BindObserver(&SensorController);
+	App::GetDataStorage().Init();
+	App::GetTCPServer().Init(SERVER_PORT);
+	App::GetTCPServer().BindObserver(&TCP_Listener);
+	App::GetMQTT().Init("DHT22_1");
+	App::GetMQTT().BindObserver(&MQTT_Handler);
 
 
 	if (temp_topic && hum_topic)
 	{
-		MQTT_Application::SetHumTopic(hum_topic);
-		MQTT_Application::SetTempTopic(temp_topic);
+		App::GetMQTT().SetHumTopic(hum_topic);
+		App::GetMQTT().SetTempTopic(temp_topic);
 	}
 
 	if (host && username && password && (port != 0))
 	{
 		if (lwt_topic && lwt_online_msg && lwt_offline_msg)
 		{
-			MQTT_Application::SetMsgOnline(lwt_online_msg);
-			MQTT_Application::Begin(host, port, username, password, lwt_topic, lwt_offline_msg);
+			App::GetMQTT().SetMsgOnline(lwt_online_msg);
+			App::GetMQTT().Begin(host, port, username, password, lwt_topic, lwt_offline_msg);
 		}
 		else
 		{
-			MQTT_Application::Begin(host, port, username, password);
+			App::GetMQTT().Begin(host, port, username, password);
 		}
 		
 	}
 
 	while(1) 
 	{
-		TCP_ServerApplication::Handle();
+		App::GetTCPServer().Handle();
 	}	
     
     return 0;  

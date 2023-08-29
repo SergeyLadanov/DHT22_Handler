@@ -22,7 +22,7 @@ private:
     void MQTT_PollConnection(MQTT_Client *obj) override;
 
 
-    static uint32_t Delay;
+    uint32_t Delay = 0;
 };
 
 #endif

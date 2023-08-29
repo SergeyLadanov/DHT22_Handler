@@ -3,8 +3,6 @@
 #define UNUSED(X) ((void) X)
 
 
-uint32_t MQTT_Controller::Delay = 0;
-
 void MQTT_Controller::MQTT_OnConnected(MQTT_Client *obj)
 {
 	if (strlen(ModelRef.GetLwtTopic()))

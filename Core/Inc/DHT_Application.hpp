@@ -9,23 +9,23 @@ public:
     class IObserver
     {
     public:
-        virtual void DHT_OnDataReady(void) = 0;
+        virtual void DHT_OnDataReady(DHT_Application *obj) = 0;
     };
 
 public:
-    static void Init(void);
-    static float GetTemperature(void);
-    static float GetHumidity(void);
-    static void BindObserver(IObserver *observer);
+    void Init(void);
+    float GetTemperature(void);
+    float GetHumidity(void);
+    void BindObserver(IObserver *observer);
 
 private:
     static void* DHT_Task(void *args);
-    static void Notify(void);
+    void Notify(void);
 
-    static float Temperature;
-    static float Humudity;
-    static IObserver* Observer;
-    static pthread_mutex_t Mutex;
+    float Temperature = 6.0;
+    float Humudity = 35.0;
+    IObserver* Observer = nullptr;
+    pthread_mutex_t Mutex;
     
 };
 

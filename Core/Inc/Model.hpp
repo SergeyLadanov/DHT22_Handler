@@ -10,7 +10,6 @@ public:
     float GetTemperature(void);
     float GetHumidity(void);
     void StoreData(float temp, float hum);
-    void SendTextData(char *buf, uint32_t len);
     char *GetHumTopic(void);
     char *GetTempTopic(void);
     char *GetLwtTopic(void);

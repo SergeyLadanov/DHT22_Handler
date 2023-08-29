@@ -1,7 +1,7 @@
 #include "DHT_Controller.hpp"
 
 
-void DHT_Controller::DHT_OnDataReady(void)
+void DHT_Controller::DHT_OnDataReady(DHT_Application *obj)
 {
-    ModelRef.StoreData(ModelRef.GetTemperature(), ModelRef.GetHumidity());
+    ModelRef.StoreData(obj->GetTemperature(), obj->GetHumidity());
 }

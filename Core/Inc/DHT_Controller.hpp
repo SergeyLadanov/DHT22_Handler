@@ -16,7 +16,7 @@ public:
     }
 private:
 
-    void DHT_OnDataReady(void) override;
+    void DHT_OnDataReady(DHT_Application *obj) override;
 };
 
 

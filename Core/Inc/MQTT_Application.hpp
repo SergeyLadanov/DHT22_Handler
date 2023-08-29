@@ -7,18 +7,23 @@
 class MQTT_Application
 {
 public:
-    static void Begin(const char *host, uint16_t port, const char *username, const char *password);
-    static void Begin(const char *host, uint16_t port, const char *username, const char *password, const char* willTopic, const char* willMessage);
-    static void SetHumTopic(char *topic);
-    static void SetTempTopic(char *topic);
-    static void Init(const char *id);
-    static void SetMsgOnline(char *msg);
-    static char *GetHumTopic(void);
-    static char *GetTempTopic(void);
-    static char *GetLwtTopic(void);
-    static char *GetOnlineMsg(void);
-    static char *GetOfflineMsg(void);
-    static void BindObserver(MQTT_Client::IObserver *observer);
+    MQTT_Application(const char *id = "none")
+        :MQTT_Hanlder(id) 
+    {
+
+    }
+    void Begin(const char *host, uint16_t port, const char *username, const char *password);
+    void Begin(const char *host, uint16_t port, const char *username, const char *password, const char* willTopic, const char* willMessage);
+    void SetHumTopic(char *topic);
+    void SetTempTopic(char *topic);
+    void Init(const char *id);
+    void SetMsgOnline(char *msg);
+    char *GetHumTopic(void);
+    char *GetTempTopic(void);
+    char *GetLwtTopic(void);
+    char *GetOnlineMsg(void);
+    char *GetOfflineMsg(void);
+    void BindObserver(MQTT_Client::IObserver *observer);
 private:
     struct Topics_t
     {
@@ -27,10 +32,10 @@ private:
         char WillTopic[32];
     };
 
-    static MQTT_Client MQTT_Hanlder;
-    static Topics_t Topics;
-    static char WillOnlineMsg[32];
-    static char WillOfflineMsg[32];
+    MQTT_Client MQTT_Hanlder;
+    Topics_t Topics;
+    char WillOnlineMsg[32];
+    char WillOfflineMsg[32];
 };
 
 
