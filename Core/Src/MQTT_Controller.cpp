@@ -12,6 +12,8 @@ void MQTT_Controller::MQTT_OnConnected(MQTT_Client *obj)
 			obj->Publish(ModelRef.GetLwtTopic(), 1, ModelRef.GetLwtOnlineMsg());
 		}
 	}
+
+	Delay = 0;
 }
 
 
@@ -36,9 +38,9 @@ void MQTT_Controller::MQTT_PollConnection(MQTT_Client *obj)
 {
         char Buf[32];
 
-		Delay++;
+		
 
-		if (Delay >= 3)
+		if (!Delay)
 		{
 			printf("Sending...\r\n");
 
@@ -53,7 +55,7 @@ void MQTT_Controller::MQTT_PollConnection(MQTT_Client *obj)
 				snprintf(Buf, sizeof(Buf), "%2.3f", ModelRef.GetHumidity());
 				obj->Publish(ModelRef.GetHumTopic(), 1, Buf);
 			}
-
-			Delay = 0;
 		}
+
+		Delay = (Delay + 1) % 180;
 }

@@ -179,7 +179,7 @@ int TLS_Client::Connect(const char *host, uint16_t port)
                 else
                 {
                     len = ret;
-                    mbedtls_printf(" %d bytes read\n\n%s", len, (char *) buf);
+                    mbedtls_printf("TLS %d bytes read\r\n", len);
 
                     if (hcl->Observer)
                     {

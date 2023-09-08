@@ -191,6 +191,7 @@ void MQTT_Client::OnTcpReceived(TLS_Client *obj, uint8_t *buf, uint32_t len)
 
 
 
+
     auto transport_getdata = [] (unsigned char* buf, int count)->int
     {
         int rc = 0;
@@ -215,6 +216,10 @@ void MQTT_Client::OnTcpReceived(TLS_Client *obj, uint8_t *buf, uint32_t len)
 
     switch(parse_result)
     {
+        case PINGRESP :
+            printf("Get MQTT ping response\r\n");
+        break;
+
         case CONNACK :
             unsigned char sessionPresent, connack_rc;
 
@@ -280,11 +285,20 @@ void MQTT_Client::OnTcpReceived(TLS_Client *obj, uint8_t *buf, uint32_t len)
 }
 
 
+
+void MQTT_Client::SetKeepAlive(uint16_t val)
+{
+    KeepAlive = val;
+}
+
+
 void MQTT_Client::OnTcpConnected(TLS_Client *obj)
 {
     printf("MQTT Connected!\r\n");
 
     MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
+
+    PingSendDelay = 0;
 
     unsigned char buf[200];
     int buflen = sizeof(buf);
@@ -292,7 +306,7 @@ void MQTT_Client::OnTcpConnected(TLS_Client *obj)
     int len = 0;
 
     data.clientID.cstring = Id;
-    data.keepAliveInterval = 20;
+    data.keepAliveInterval = KeepAlive;
     data.cleansession = 1;
     data.username.cstring = Username;
     data.password.cstring = Password;
@@ -323,6 +337,17 @@ void MQTT_Client::OnTcpDisconnected(TLS_Client *obj)
 
 void MQTT_Client::TcpPollConnectionl(TLS_Client *obj)
 {
+    PingSendDelay = (PingSendDelay + 1) % (KeepAlive / 2);
+
+    if (!PingSendDelay)
+    {
+        printf("Send MQTT ping request...\r\n");
+        int len = 0;
+        unsigned char buf[128];
+        len = MQTTSerialize_pingreq(buf, sizeof(buf));
+        obj->Send((uint8_t *) buf, len);
+    }
+
     if (Observer != nullptr)
     {
         Observer->MQTT_PollConnection(this);

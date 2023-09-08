@@ -44,6 +44,8 @@ private:
     pthread_t KeepConnectionTask;
     DataStruct Data;
     IObserver *Observer = nullptr;
+    uint16_t KeepAlive = 120;
+    uint32_t PingSendDelay = 0;
     char Id[32];
 public:
     MQTT_Client(const char *id = nullptr)
@@ -57,6 +59,7 @@ public:
     }
 
     void SetId(const char *id);
+    void SetKeepAlive(uint16_t val);
     bool Subscribe(char *topic, int msgid = 1);
     bool Publish(char *topic, unsigned char retained, char* payload);
     bool Publish(char *topic, unsigned char retained, char* payload, int payloadlen);
