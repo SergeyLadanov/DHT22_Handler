@@ -57,5 +57,5 @@ void MQTT_Controller::MQTT_PollConnection(MQTT_Client *obj)
 			}
 		}
 
-		Delay = (Delay + 1) % 180;
+		Delay = (Delay + 1) % 60;
 }
